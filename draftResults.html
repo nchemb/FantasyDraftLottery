@@ -1,13 +1,16 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!--google adsense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1116219889806432"
+     crossorigin="anonymous"></script>
+
   	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-64410508-15"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'UA-64410508-15');
     </script>
 
@@ -15,18 +18,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- SEO Meta Tags -->
+    <title>Draft Results - Fantasy Draft Lottery | Your Fantasy Draft Order</title>
+    <meta name="description" content="View your fantasy draft lottery results. Reveal each pick one by one with NFL or NBA music for the ultimate draft day experience.">
+    <link rel="canonical" href="https://www.fantasydraftlottery.com/draftResults.html">
+    <meta name="robots" content="noindex">
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <title>Fantasy Draft Lottery - Random and Weighted Draft Lottery Simulator for All Fantasy Sports Leagues - NBA, NFL, MLB, NHL</title>
-    <link rel="stylesheet" type="text/css" href="style.css?version=3">
-
-
+    <link rel="stylesheet" type="text/css" href="style.css?version=20">
     </head>
   <body>
 
     <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+  <nav class="navbar navbar-expand-lg navbar-dark static-top">
     <div class="container">
       <a class="navbar-brand" href="/">Fantasy Draft Lottery</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,10 +40,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">Home
-              <span class="sr-only">(current)</span>
-            </a>
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="blog.html">Blog</a>
@@ -45,12 +49,6 @@
           <li class="nav-item">
             <a class="nav-link" href="About.html">About</a>
           </li>
-          <!--<li class="nav-item">
-            <a class="nav-link" href="#">Services</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
-          </li>-->
         </ul>
       </div>
     </div>
@@ -59,53 +57,43 @@
   <!-- Page Content -->
   <div class="container">
     <div class="row">
-      <div class="col-lg-12 text-center">
-        <h1 class="mt-5">Pick Results</h1>
+      <div class="col-lg-12 text-center" style="margin-top: 2rem;">
+        <h1>Pick Results</h1>
       </div>
 
-<div class="container">
-      <ul class="nav nav-pills">
-    	<li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#home">NFL Music</a></li>
-    	<li class="nav-item"><a class="nav-link" data-toggle="pill" href="#menu1">NBA Music</a></li>
-  	  </ul>
+      <div class="container" style="margin-bottom: 1.5rem;">
+        <ul class="nav nav-pills">
+    	    <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#home">NFL Music</a></li>
+    	    <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#menu1">NBA Music</a></li>
+  	    </ul>
 
-  	  <div class="tab-content">
-    	<div id="home" class="tab-pane active">
-      		<audio controls><source src="espn_nfl_music_comp.mp3" type="audio/mpeg" style="vertical-align: middle;">Not Valid</audio>
-   		</div>
-    	<div id="menu1" class="tab-pane">
-      		<audio controls><source src="nba_on_espn_comp.mp3" type="audio/mpeg" style="vertical-align: middle;">Not Valid</audio>
-    	</div>
-	  </div>
-	</div>
-
+  	    <div class="tab-content">
+    	    <div id="home" class="tab-pane active">
+      		  <audio controls><source src="NFL Network's Thursday Night Football Theme(Extended).wav" type="audio/wav">Not Valid</audio>
+   		    </div>
+    	    <div id="menu1" class="tab-pane">
+      		  <audio controls><source src="NBA On NBC Theme 1991-2002.wav" type="audio/wav">Not Valid</audio>
+    	    </div>
+	      </div>
+	    </div>
     </div>
 
     <div class="col-md-8">
-
-    <h4 id="leagueName"></h4>
-    <button type="button" class="btn btn-primary showAll">Show All</button>
-    <div style="word-wrap: break-word; margin-top: 20px; padding: 5px; width:350px; border: 1px solid black;" class="tableResults" id="teamNames">
-
-      <!-- Team Names Go Here -->
+      <h4 id="leagueName"></h4>
+      <button type="button" class="btn btn-primary showAll">Show All</button>
+      <div class="tableResults" id="teamNames">
+        <!-- Team Names Go Here -->
+      </div>
     </div>
-  </div>
-
 
     <hr>
 
     <div class="col-md-8">
+      <h2 class="my-4">From The Blog</h2>
 
-      
-
-      <h1 class="my-4">The Blog
-          <!--<small>Fantasy Draft Lottery</small>-->
-      </h1>
-
-      <!-- Blog Post -->
       <div class="card mb-4">
         <div class="card-body">
-          <h2 class="card-title">Why Fantasy Football?</h2>
+          <h3 class="card-title">Why Fantasy Football?</h3>
           <p class="card-text">The thrill and benefits of investing in a fantasy football league</p>
           <a href="blogPosts/post1.html" class="btn btn-primary">Read More &rarr;</a>
         </div>
@@ -117,8 +105,8 @@
 
       <div class="card mb-4">
         <div class="card-body">
-          <h2 class="card-title">Understanding Fantasy Basketball</h2>
-          <p class="card-text">As with all fantasy sports, league format can alter which players are most valuable. Fantasy basketball is typically scored in several different ways. Every fantasy platform has a different set of rules to leverage</p>
+          <h3 class="card-title">Understanding Fantasy Basketball</h3>
+          <p class="card-text">As with all fantasy sports, league format can alter which players are most valuable. Fantasy basketball is typically scored in several different ways.</p>
           <a href="blogPosts/post2.html" class="btn btn-primary">Read More &rarr;</a>
         </div>
         <div class="card-footer text-muted">
@@ -126,11 +114,10 @@
           <a href="/">FDL Team</a>
         </div>
       </div>
-    
 
-    <div class="card mb-4">
+      <div class="card mb-4">
         <div class="card-body">
-          <h2 class="card-title">Understanding Rankings and Projections</h2>
+          <h3 class="card-title">Understanding Rankings and Projections</h3>
           <p class="card-text">During both your fantasy draft and the regular season, you will be constantly hit over the head with rankings and projections. With so many sources generating these numbers, they must be useful, right?</p>
           <a href="blogPosts/post3.html" class="btn btn-primary">Read More &rarr;</a>
         </div>
@@ -141,22 +128,14 @@
       </div>
 
       <div>
-        <p>Read More at <a href="blog.html"> Blog Posts </a>
-        </p>
+        <p>Read More at <a href="blog.html">Blog Posts</a></p>
       </div>
-
-
-
     </div>
 
-    <hr>
-  <div style="text-align: center; margin-bottom: 60px;">
-    <p>Fantasy Draft Lottery | 2018-2021 | <a href="/">Home</a> | <a href="blog.html">Blog</a></p>
-  </div> 
+    <div class="site-footer">
+      <p>Fantasy Draft Lottery | 2018-2026 | <a href="/">Home</a> | <a href="blog.html">Blog</a> | <a href="About.html">About</a></p>
+    </div>
 
-
-        <!-- Optional JavaScript -->
-    
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
