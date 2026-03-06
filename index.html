@@ -124,6 +124,27 @@
         <h1 class="mt-5">Fantasy Draft Order Generator</h1>
         <p class="lead">Random draft lottery simulator with an option for weighted lotteries, where each team gets a specific number of lottery balls.</p>
         <p class="lead">Free, simple, and just works.</p>
+
+        <div class="loops-email-section">
+          <p class="loops-caption">Want more free tools? Stay in touch.</p>
+          <div class="newsletter-form-container fdl-loops">
+            <form class="newsletter-form" action="https://app.loops.so/api/newsletter-form/cml5qh7lc055u0i2hj1tinbvm" method="POST">
+              <div class="fdl-form-row">
+                <input class="newsletter-form-input fdl-input" placeholder="Enter your email" required type="email" name="newsletter-form-input">
+                <button type="submit" class="newsletter-form-button fdl-btn">Stay in Touch</button>
+                <button type="button" class="newsletter-loading-button fdl-btn" style="display:none;">Please wait...</button>
+              </div>
+            </form>
+            <div class="newsletter-success" style="display:none; align-items:center; justify-content:center;">
+              <p class="newsletter-success-message fdl-success-msg">You're in! Talk soon.</p>
+            </div>
+            <div class="newsletter-error" style="display:none; align-items:center; justify-content:center;">
+              <p class="newsletter-error-message fdl-error-msg">Oops! Something went wrong, please try again</p>
+            </div>
+            <button class="newsletter-back-button fdl-back-btn" type="button" style="display:none;">&#8592; Back</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -196,15 +217,26 @@
     <div class="col-md-8">
       <h2 class="my-4">From The Blog</h2>
 
-      <!-- Blog Post -->
       <div class="card mb-4">
         <div class="card-body">
-          <h3 class="card-title">Why Fantasy Football?</h3>
-          <p class="card-text">The thrill and benefits of investing in a fantasy football league</p>
+          <h3 class="card-title">How to Run a Fantasy Draft Lottery</h3>
+          <p class="card-text">Random vs weighted lotteries explained, plus a step-by-step guide to running a fair draft order reveal for your league.</p>
+          <a href="blogPosts/post4.html" class="btn btn-primary">Read More &rarr;</a>
+        </div>
+        <div class="card-footer text-muted">
+          <time datetime="2025-01-10">January 10, 2025</time> by
+          <a href="/">FDL Team</a>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <h3 class="card-title">Why Play Fantasy Football?</h3>
+          <p class="card-text">Fantasy football gives you a stake in every NFL game, builds competition in your social circle, and makes draft day one of the best events of the year.</p>
           <a href="blogPosts/post1.html" class="btn btn-primary">Read More &rarr;</a>
         </div>
         <div class="card-footer text-muted">
-          Posted on August 10, 2020 by
+          Updated <time datetime="2025-01-20">January 20, 2025</time> by
           <a href="/">FDL Team</a>
         </div>
       </div>
@@ -212,23 +244,11 @@
       <div class="card mb-4">
         <div class="card-body">
           <h3 class="card-title">Understanding Fantasy Basketball</h3>
-          <p class="card-text">As with all fantasy sports, league format can alter which players are most valuable. Fantasy basketball is typically scored in several different ways.</p>
+          <p class="card-text">Learn how fantasy basketball scoring formats work, what stats matter most, and how to draft a competitive roster for any league format.</p>
           <a href="blogPosts/post2.html" class="btn btn-primary">Read More &rarr;</a>
         </div>
         <div class="card-footer text-muted">
-          Posted on February 4, 2020 by
-          <a href="/">FDL Team</a>
-        </div>
-      </div>
-
-  	  <div class="card mb-4">
-        <div class="card-body">
-          <h3 class="card-title">Understanding Rankings and Projections</h3>
-          <p class="card-text">During both your fantasy draft and the regular season, you will be constantly hit over the head with rankings and projections. With so many sources generating these numbers, they must be useful, right?</p>
-          <a href="blogPosts/post3.html" class="btn btn-primary">Read More &rarr;</a>
-        </div>
-        <div class="card-footer text-muted">
-          Posted on July 1, 2020 by
+          Updated <time datetime="2025-02-10">February 10, 2025</time> by
           <a href="/">FDL Team</a>
         </div>
       </div>
@@ -239,7 +259,8 @@
     </div>
 
    <div class="site-footer">
-   	<p>Fantasy Draft Lottery | 2018-2026 | <a href="/">Home</a> | <a href="blog.html">Blog</a> | <a href="About.html">About</a></p>
+   	<p>Fantasy Draft Lottery | 2018-2026 | <a href="/">Home</a> | <a href="blog.html">Blog</a> | <a href="About.html">About</a> | <a href="https://www.buildwithneej.com" target="_blank" rel="noopener">buildwithneej.com</a></p>
+    <p class="site-footer-social">Follow @buildwithneej: <a href="https://x.com/buildwithneej" target="_blank" rel="noopener">Twitter</a> &middot; <a href="https://instagram.com/buildwithneej" target="_blank" rel="noopener">Instagram</a> &middot; <a href="https://tiktok.com/@buildwithneej" target="_blank" rel="noopener">TikTok</a></p>
    </div>
 
   </div>
@@ -249,5 +270,100 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script type="text/javascript" src="main.js?version=9"></script>
+    <script>
+    (function() {
+      function submitHandler(event) {
+        event.preventDefault();
+        var container = event.target.parentNode;
+        var form = container.querySelector(".newsletter-form");
+        var formInput = container.querySelector(".newsletter-form-input");
+        var success = container.querySelector(".newsletter-success");
+        var errorContainer = container.querySelector(".newsletter-error");
+        var errorMessage = container.querySelector(".newsletter-error-message");
+        var backButton = container.querySelector(".newsletter-back-button");
+        var submitButton = container.querySelector(".newsletter-form-button");
+        var loadingButton = container.querySelector(".newsletter-loading-button");
+
+        var rateLimit = function() {
+          errorContainer.style.display = "flex";
+          errorMessage.innerText = "Too many signups, please try again in a little while";
+          submitButton.style.display = "none";
+          formInput.style.display = "none";
+          backButton.style.display = "block";
+        };
+
+        var time = new Date();
+        var timestamp = time.valueOf();
+        var previousTimestamp = localStorage.getItem("loops-form-timestamp");
+
+        if (previousTimestamp && Number(previousTimestamp) + 60000 > timestamp) {
+          rateLimit();
+          return;
+        }
+        localStorage.setItem("loops-form-timestamp", timestamp);
+
+        submitButton.style.display = "none";
+        loadingButton.style.display = "flex";
+
+        var formBody = "userGroup=fantasydraftlottery&mailingLists=&email=" + encodeURIComponent(formInput.value);
+
+        fetch(event.target.action, {
+          method: "POST",
+          body: formBody,
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        })
+          .then(function(res) { return [res.ok, res.json(), res]; })
+          .then(function(arr) {
+            var ok = arr[0], dataPromise = arr[1], res = arr[2];
+            if (ok) {
+              success.style.display = "flex";
+              form.reset();
+            } else {
+              dataPromise.then(function(data) {
+                errorContainer.style.display = "flex";
+                errorMessage.innerText = data.message ? data.message : res.statusText;
+              });
+            }
+          })
+          .catch(function(error) {
+            if (error.message === "Failed to fetch") { rateLimit(); return; }
+            errorContainer.style.display = "flex";
+            if (error.message) errorMessage.innerText = error.message;
+            localStorage.setItem("loops-form-timestamp", '');
+          })
+          .finally(function() {
+            formInput.style.display = "none";
+            loadingButton.style.display = "none";
+            backButton.style.display = "block";
+          });
+      }
+
+      function resetFormHandler(event) {
+        var container = event.target.parentNode;
+        var formInput = container.querySelector(".newsletter-form-input");
+        var success = container.querySelector(".newsletter-success");
+        var errorContainer = container.querySelector(".newsletter-error");
+        var errorMessage = container.querySelector(".newsletter-error-message");
+        var backButton = container.querySelector(".newsletter-back-button");
+        var submitButton = container.querySelector(".newsletter-form-button");
+
+        success.style.display = "none";
+        errorContainer.style.display = "none";
+        errorMessage.innerText = "Oops! Something went wrong, please try again";
+        backButton.style.display = "none";
+        formInput.style.display = "flex";
+        submitButton.style.display = "flex";
+      }
+
+      var formContainers = document.getElementsByClassName("newsletter-form-container");
+      for (var i = 0; i < formContainers.length; i++) {
+        var fc = formContainers[i];
+        if (fc.classList.contains("newsletter-handlers-added")) continue;
+        fc.querySelector(".newsletter-form").addEventListener("submit", submitHandler);
+        fc.querySelector(".newsletter-back-button").addEventListener("click", resetFormHandler);
+        fc.classList.add("newsletter-handlers-added");
+      }
+    })();
+    </script>
  </body>
 </html>

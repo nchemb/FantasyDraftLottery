@@ -283,6 +283,23 @@ audio {
   text-decoration: underline;
 }
 
+.site-footer-social {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.site-footer-social a {
+  color: var(--text-muted);
+  text-decoration: none;
+  margin: 0 0.2rem;
+}
+
+.site-footer-social a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
 /* === Responsive === */
 @media (max-width: 480px) {
   .generateOrder {
@@ -299,5 +316,138 @@ audio {
 @media (min-width: 1025px) {
   .classWeight {
     width: 65px;
+  }
+}
+
+/* === Results Page CTA Card === */
+.fdl-results-cta {
+  background: var(--gradient);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.fdl-results-cta-heading {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+/* === Loops Email Capture === */
+.loops-email-section {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255,255,255,0.18);
+}
+
+.loops-caption {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  margin-bottom: 0.75rem;
+}
+
+.newsletter-form-container.fdl-loops {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fdl-form-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.fdl-input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(255,255,255,0.97);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #212529;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.fdl-input:focus {
+  border-color: rgba(255,255,255,0.7);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
+}
+
+.fdl-input::placeholder {
+  color: #9ca3af;
+}
+
+.fdl-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.45);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.fdl-btn:hover {
+  background: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.75);
+}
+
+.fdl-success-msg {
+  color: rgba(255,255,255,0.9);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.fdl-error-msg {
+  color: #fca5a5;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.fdl-back-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 8px;
+  padding: 0;
+}
+
+.fdl-back-btn:hover {
+  color: rgba(255,255,255,0.9);
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .fdl-form-row {
+    max-width: 100%;
+  }
+
+  .fdl-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
+  .fdl-input {
+    font-size: 0.8rem;
   }
 }
