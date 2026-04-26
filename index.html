@@ -137,7 +137,7 @@
         <div class="loops-email-section">
           <p class="loops-caption">Want more free tools? Stay in touch.</p>
           <div class="newsletter-form-container fdl-loops">
-            <form class="newsletter-form" action="https://app.loops.so/api/newsletter-form/cml5qh7lc055u0i2hj1tinbvm" method="POST">
+            <form class="newsletter-form" action="/api/lead" method="POST">
               <div class="fdl-form-row">
                 <input class="newsletter-form-input fdl-input" placeholder="Enter your email" required type="email" name="newsletter-form-input">
                 <button type="submit" class="newsletter-form-button fdl-btn">Stay in Touch</button>
@@ -314,12 +314,12 @@
         submitButton.style.display = "none";
         loadingButton.style.display = "flex";
 
-        var formBody = "userGroup=fantasydraftlottery&mailingLists=&email=" + encodeURIComponent(formInput.value);
+        var formBody = JSON.stringify({ email: formInput.value });
 
-        fetch(event.target.action, {
+        fetch("/api/lead", {
           method: "POST",
           body: formBody,
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          headers: { "Content-Type": "application/json" },
         })
           .then(function(res) { return [res.ok, res.json(), res]; })
           .then(function(arr) {
