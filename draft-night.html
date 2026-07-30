@@ -92,7 +92,41 @@
     }
     .buy-league { font-size: 18px; margin-bottom: 6px; }
     .buy-league strong { color: var(--gold); }
-    .buy-teams { color: rgba(244,241,232,0.65); font-size: 14px; margin-bottom: 18px; }
+    .buy-teams { color: rgba(244,241,232,0.65); font-size: 14px; margin-bottom: 12px; }
+
+    /* Roster confirmation: the commissioner is about to pay, so show them
+       exactly what carried over instead of asking them to trust it. */
+    .roster {
+      border: 1px solid rgba(244,241,232,0.16);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .roster-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 9px 12px;
+      background: rgba(245,197,66,0.08);
+      border-bottom: 1px solid rgba(244,241,232,0.16);
+      font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--gold);
+    }
+    .roster-check { color: #7fd18b; letter-spacing: 0; text-transform: none; font-size: 13px; }
+    .roster-list { list-style: none; margin: 0; padding: 0; }
+    .roster-list li {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 7px 12px; font-size: 14px;
+      border-bottom: 1px solid rgba(244,241,232,0.07);
+    }
+    .roster-list li:last-child { border-bottom: none; }
+    .roster-num { color: rgba(244,241,232,0.4); font-size: 12px; min-width: 20px; }
+    .roster-name { flex: 1; word-break: break-word; }
+    .roster-odds { color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .roster-balls { color: rgba(244,241,232,0.5); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .roster-foot {
+      padding: 8px 12px; font-size: 12px; color: rgba(244,241,232,0.55);
+      border-top: 1px solid rgba(244,241,232,0.16); background: rgba(0,0,0,0.15);
+    }
+    .roster-edit { display: inline-block; margin-bottom: 18px; font-size: 13px; }
     .mode-row { margin: 14px 0; }
     .mode-row label { display: block; padding: 10px 12px; border: 1px solid rgba(244,241,232,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
     .mode-row label.selected { border-color: var(--gold); background: rgba(245,197,66,0.07); }
@@ -162,6 +196,15 @@
         <div id="leagueSummary" class="hiddenBlock" style="display:none;">
           <div class="buy-league">League: <strong id="buyLeague"></strong></div>
           <div class="buy-teams" id="buyTeams"></div>
+          <div class="roster" id="rosterBox">
+            <div class="roster-head">
+              <span id="rosterTitle">Your teams</span>
+              <span class="roster-check" id="rosterCheck">✓ Saved</span>
+            </div>
+            <ul class="roster-list" id="rosterList"></ul>
+            <div class="roster-foot" id="rosterFoot" style="display:none;"></div>
+          </div>
+          <a class="roster-edit" href="/" id="rosterEdit">← Edit teams or weights</a>
           <div class="mode-row" id="modeRow">
             <label id="labelSched" class="selected">
               <input type="radio" name="mode" value="scheduled" checked>
@@ -229,9 +272,81 @@
         document.getElementById("leagueSummary").style.display = "block";
         document.getElementById("buyLeague").textContent = stored.leagueName;
         document.getElementById("buyTeams").textContent =
-          stored.teams.length + " teams: " + stored.teams.map(function (t) { return t.name; }).join(", ");
+          stored.teams.length + (stored.teams.length === 1 ? " team" : " teams") +
+          (stored.weighted ? " · weighted lottery" : " · every team equally likely");
+        renderRoster(stored);
       } else {
         document.getElementById("noLeague").style.display = "block";
+      }
+
+      // Show the exact roster that carried over from the home page. Weights are
+      // the thing most worth confirming: they're invisible once you leave that
+      // page, and a wrong ball count silently changes who wins the lottery.
+      function renderRoster(s) {
+        var list = document.getElementById("rosterList");
+        var weighted = !!s.weighted;
+        var total = 0;
+        if (weighted) {
+          s.teams.forEach(function (t) { total += Number(t.weight) || 0; });
+        }
+
+        document.getElementById("rosterTitle").textContent =
+          weighted ? "Your teams and lottery odds" : "Your teams";
+
+        list.innerHTML = "";
+        s.teams.forEach(function (t, i) {
+          var li = document.createElement("li");
+
+          var num = document.createElement("span");
+          num.className = "roster-num";
+          num.textContent = (i + 1) + ".";
+
+          // textContent, not innerHTML — team names are user input.
+          var name = document.createElement("span");
+          name.className = "roster-name";
+          name.textContent = t.name;
+
+          li.appendChild(num);
+          li.appendChild(name);
+
+          if (weighted) {
+            var balls = Number(t.weight) || 0;
+            var span = document.createElement("span");
+            span.className = "roster-balls";
+            span.textContent = balls + (balls === 1 ? " ball" : " balls");
+            li.appendChild(span);
+
+            var odds = document.createElement("span");
+            odds.className = "roster-odds";
+            var pct = total > 0 ? (balls / total) * 100 : 0;
+            odds.textContent = (pct >= 10 ? pct.toFixed(0) : pct.toFixed(1)) + "%";
+            odds.title = "Chance of landing the first overall pick";
+            li.appendChild(odds);
+          }
+
+          list.appendChild(li);
+        });
+
+        if (weighted) {
+          // The API only accepts 1-1000 balls, so an empty or silly weight would
+          // otherwise fail at the Stripe step, after they've committed to buying.
+          var bad = s.teams.filter(function (t) {
+            var w = Number(t.weight);
+            return !Number.isFinite(w) || w < 1 || w > 1000 || Math.floor(w) !== w;
+          });
+          var foot = document.getElementById("rosterFoot");
+          foot.style.display = "block";
+          if (bad.length) {
+            foot.style.color = "#f0a3a3";
+            foot.textContent =
+              bad.length + (bad.length === 1 ? " team has" : " teams have") +
+              " a ball count outside 1–1000. Fix it on the home page before paying.";
+            document.getElementById("rosterCheck").textContent = "⚠ Check weights";
+            document.getElementById("rosterCheck").style.color = "#f0a3a3";
+          } else {
+            foot.textContent = total + " balls total · % is each team's chance at the first overall pick";
+          }
+        }
       }
 
       var schedInput = document.getElementById("schedInput");
