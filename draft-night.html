@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Draft Night '26 — Live Broadcast Draft Reveal | Fantasy Draft Lottery</title>
+  <meta name="description" content="Turn your fantasy draft order reveal into a live broadcast. Sealed, tamper-proof order plus an announcer who calls every pick. $9 per league.">
+  <link rel="icon" href="https://img.icons8.com/offices/30/000000/trophy.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #f5c542;
+      --gold-dim: #b8902c;
+      --navy: #0b1220;
+      --white: #f4f1e8;
+    }
+    body {
+      background: #05080f;
+      color: var(--white);
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.6;
+    }
+    a { color: var(--gold); }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px; }
+
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 70px 20px 50px;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 0%, rgba(24,38,70,0.9), rgba(5,8,16,1) 75%);
+    }
+    .hero video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.22;
+      z-index: 0;
+    }
+    .hero > div { position: relative; z-index: 1; }
+    .hero-brand { color: var(--gold); letter-spacing: 6px; font-weight: bold; font-size: 14px; margin-bottom: 14px; }
+    h1 { font-size: clamp(34px, 7vw, 58px); letter-spacing: 2px; margin-bottom: 14px; text-shadow: 0 2px 30px rgba(245,197,66,0.3); }
+    .hero-sub { font-size: 19px; color: rgba(244,241,232,0.85); max-width: 560px; margin: 0 auto 28px; }
+
+    .btn-gold {
+      display: inline-block;
+      background: linear-gradient(135deg, #f8d878, var(--gold) 45%, #c99a25);
+      color: #241a02;
+      border: none;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: bold;
+      font-size: 18px;
+      letter-spacing: 1px;
+      padding: 15px 32px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 30px rgba(245,197,66,0.35);
+    }
+    .btn-gold:hover { filter: brightness(1.08); color: #241a02; text-decoration: none; }
+    .btn-outline {
+      display: inline-block;
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 16px;
+      padding: 14px 28px;
+      cursor: pointer;
+      text-decoration: none;
+      margin-left: 10px;
+    }
+    .btn-outline:hover { background: rgba(245,197,66,0.1); text-decoration: none; }
+
+    section { padding: 44px 0; border-bottom: 1px solid rgba(244,241,232,0.08); }
+    h2 { font-size: 26px; margin-bottom: 14px; color: var(--gold); letter-spacing: 1px; }
+    p + p { margin-top: 12px; }
+    .muted { color: rgba(244,241,232,0.7); }
+
+    ol.steps { margin: 16px 0 0 22px; }
+    ol.steps li { margin-bottom: 10px; }
+
+    .buy-box {
+      background: rgba(11,18,32,0.75);
+      border: 1px solid rgba(245,197,66,0.4);
+      border-radius: 10px;
+      padding: 26px;
+      margin-top: 10px;
+    }
+    .buy-league { font-size: 18px; margin-bottom: 6px; }
+    .buy-league strong { color: var(--gold); }
+    .buy-teams { color: rgba(244,241,232,0.65); font-size: 14px; margin-bottom: 18px; }
+    .mode-row { margin: 14px 0; }
+    .mode-row label { display: block; padding: 10px 12px; border: 1px solid rgba(244,241,232,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
+    .mode-row label.selected { border-color: var(--gold); background: rgba(245,197,66,0.07); }
+    .mode-row input { margin-right: 10px; }
+    #schedRow { margin: 6px 0 16px; }
+    #schedRow input {
+      width: 100%;
+      background: #101a30;
+      border: 1px solid rgba(244,241,232,0.25);
+      color: var(--white);
+      border-radius: 5px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 15px;
+    }
+    .buy-cta { width: 100%; margin-top: 6px; }
+    .buy-fine { font-size: 12.5px; color: rgba(244,241,232,0.5); margin-top: 12px; text-align: center; }
+    .no-league { text-align: center; padding: 10px 0; }
+
+    .faq dt { color: var(--gold); font-weight: bold; margin-top: 18px; }
+    .faq dd { margin: 4px 0 0 0; }
+
+    footer { text-align: center; padding: 34px 20px 50px; color: rgba(244,241,232,0.5); font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <video src="broadcast/t6-confetti.mp4" autoplay muted loop playsinline></video>
+    <div>
+      <div class="hero-brand">FANTASY DRAFT LOTTERY PRESENTS</div>
+      <h1>DRAFT NIGHT '26</h1>
+      <p class="hero-sub">Your draft order reveal, run as a live broadcast. An announcer calls every pick by name while your whole league watches the board fill in, together, in real time.</p>
+      <a class="btn-gold" href="#buy">Set up my broadcast · $9</a>
+      <a class="btn-outline" href="reveal.html?demo=1" target="_blank">Watch the sample</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <section>
+      <h2>What your league sees</h2>
+      <p>At showtime, the link you shared turns into a broadcast. A retro arena on a rainy night. A commissioner at the podium. Then the announcer starts calling picks from the bottom of the order: "With the tenth pick in your league's draft... the league selects..." and the name slams onto the draft board. Pick by pick it climbs toward first overall, the room holds its breath between the last two names, and confetti falls on the winner.</p>
+      <p>The sample above runs about two and a half minutes with a six-team league. Yours uses your real team names, spoken out loud.</p>
+    </section>
+
+    <section>
+      <h2>Nobody can accuse you of rigging it</h2>
+      <p>The order is generated once, on our servers, the moment you pay. It gets locked with a timestamp and a cryptographic fingerprint before a single person sees it, and that includes you. There is no rerun button. When your league mate swears you kept rolling until you got the first pick, the seal says otherwise.</p>
+      <p class="muted">This is the part the free generator can't give you: with any client-side tool, a commissioner can quietly regenerate until they like the result. A sealed order can't be touched.</p>
+    </section>
+
+    <section>
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li>Enter your league and team names on the <a href="/">home page</a>, then hit the Draft Night button.</li>
+        <li>Pick a broadcast time (or choose to start it yourself) and pay $9.</li>
+        <li>You get two links: a share link for the league and a private commissioner link for you.</li>
+        <li>At showtime everyone on the link watches the same broadcast at the same moment. Anyone who misses it gets the replay.</li>
+      </ol>
+      <p class="muted" style="margin-top:14px;">Works for 2 to 32 teams. Weighted odds carry over from the form, so your last-place friend can have his extra lottery balls.</p>
+    </section>
+
+    <section id="buy">
+      <h2>Set up your broadcast</h2>
+      <div class="buy-box">
+        <div id="leagueSummary" class="hiddenBlock" style="display:none;">
+          <div class="buy-league">League: <strong id="buyLeague"></strong></div>
+          <div class="buy-teams" id="buyTeams"></div>
+          <div class="mode-row" id="modeRow">
+            <label id="labelSched" class="selected">
+              <input type="radio" name="mode" value="scheduled" checked>
+              <strong>Schedule it:</strong> pick a date and time and the broadcast starts itself
+            </label>
+            <label id="labelManual">
+              <input type="radio" name="mode" value="manual">
+              <strong>I'll start it live:</strong> you get a start button on your commissioner link
+            </label>
+          </div>
+          <div id="schedRow">
+            <input type="datetime-local" id="schedInput">
+          </div>
+          <div class="mode-row">
+            <label for="gapSelect" style="border:none; padding:0 0 4px; margin:0; cursor:default;">Time between picks</label>
+            <select id="gapSelect" style="width:100%; background:#101a30; border:1px solid rgba(244,241,232,0.25); color:var(--white); border-radius:5px; padding:12px; font-family:inherit; font-size:15px;">
+              <option value="0" selected>Rapid fire (no break, about 3 minutes total)</option>
+              <option value="30">30 seconds between picks</option>
+              <option value="60">1 minute between picks</option>
+              <option value="120">2 minutes between picks</option>
+              <option value="300">5 minutes between picks (full draft-party mode)</option>
+            </select>
+          </div>
+          <button class="btn-gold buy-cta" id="buyBtn">Seal my order &amp; get my links · $9</button>
+          <div class="buy-fine">One-time payment per league. Secure checkout through Stripe. If anything goes wrong with your broadcast, email nchemb@gmail.com and we'll fix it or refund you.</div>
+        </div>
+        <div id="noLeague" class="no-league" style="display:none;">
+          <p>First, enter your league name and teams on the home page.</p>
+          <p style="margin-top:14px;"><a class="btn-gold" href="/?dn=1">Enter my league</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq">
+      <h2>Questions leagues actually ask</h2>
+      <dl>
+        <dt>What if someone can't make it live?</dt>
+        <dd>The same link plays the replay after the broadcast ends. They miss the moment, not the result.</dd>
+        <dt>Can I change the time after I pay?</dt>
+        <dd>Yes. Your commissioner link lets you move the broadcast time any time before it starts.</dd>
+        <dt>Can I see the order early, as the commissioner?</dt>
+        <dd>No, and that's the point. You find out with everyone else.</dd>
+        <dt>Phones?</dt>
+        <dd>Works on phones and laptops. Viewers tap once to join, which turns the sound on (phones require that tap before a page can play audio).</dd>
+        <dt>What does it cost?</dt>
+        <dd>$9, once, per league. The free generator on the home page stays free.</dd>
+      </dl>
+    </section>
+
+  </div>
+
+  <footer>
+    <a href="/">fantasydraftlottery.com</a>, the free fantasy draft order generator since forever.
+  </footer>
+
+  <script>
+    (function () {
+      var stored = null;
+      try { stored = JSON.parse(localStorage.getItem("fdl_dn_league") || "null"); } catch (e) {}
+
+      var valid = stored && stored.leagueName && Array.isArray(stored.teams) &&
+        stored.teams.length >= 2 && stored.teams.every(function (t) { return t.name; });
+
+      if (valid) {
+        document.getElementById("leagueSummary").style.display = "block";
+        document.getElementById("buyLeague").textContent = stored.leagueName;
+        document.getElementById("buyTeams").textContent =
+          stored.teams.length + " teams: " + stored.teams.map(function (t) { return t.name; }).join(", ");
+      } else {
+        document.getElementById("noLeague").style.display = "block";
+      }
+
+      var schedInput = document.getElementById("schedInput");
+      if (schedInput) {
+        var d = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        d.setMinutes(0, 0, 0);
+        schedInput.value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      }
+
+      var radios = document.querySelectorAll('input[name="mode"]');
+      radios.forEach(function (r) {
+        r.addEventListener("change", function () {
+          document.getElementById("labelSched").classList.toggle("selected", r.value === "scheduled" && r.checked);
+          document.getElementById("labelManual").classList.toggle("selected", r.value === "manual" && r.checked);
+          document.getElementById("schedRow").style.display = (r.value === "scheduled" && r.checked) ? "block" : "none";
+        });
+      });
+
+      var buyBtn = document.getElementById("buyBtn");
+      if (buyBtn) buyBtn.addEventListener("click", function () {
+        var mode = document.querySelector('input[name="mode"]:checked').value;
+        var scheduledAt = null;
+        if (mode === "scheduled") {
+          if (!schedInput.value) { alert("Pick a date and time for the broadcast."); return; }
+          scheduledAt = new Date(schedInput.value).toISOString();
+          if (Date.parse(scheduledAt) < Date.now()) { alert("That time already passed. Pick a future time."); return; }
+        }
+        buyBtn.disabled = true;
+        buyBtn.textContent = "Sealing your lottery…";
+        fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            leagueName: stored.leagueName,
+            teams: stored.teams,
+            weighted: !!stored.weighted,
+            scheduledAt: scheduledAt,
+            pickGapSeconds: Number(document.getElementById("gapSelect").value),
+          }),
+        })
+          .then(function (res) { return res.json().then(function (j) { return { ok: res.ok, j: j }; }); })
+          .then(function (r) {
+            if (r.ok && r.j.url) { location.href = r.j.url; return; }
+            alert(r.j.error || "Checkout didn't start. Try again.");
+            buyBtn.disabled = false;
+            buyBtn.textContent = "Seal my order & get my links · $9";
+          })
+          .catch(function () {
+            alert("Checkout didn't start. Try again.");
+            buyBtn.disabled = false;
+            buyBtn.textContent = "Seal my order & get my links · $9";
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

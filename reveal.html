@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>Draft Night '26 — Live Draft Reveal</title>
+  <link rel="icon" href="https://img.icons8.com/offices/30/000000/trophy.png">
+  <link rel="stylesheet" href="reveal.css?v=4">
+</head>
+<body>
+
+  <div id="stage">
+    <video id="vidA" class="stage-video" playsinline muted preload="auto"></video>
+    <video id="vidB" class="stage-video" playsinline muted preload="auto"></video>
+
+    <div class="letterbox letterbox-top"></div>
+    <div class="letterbox letterbox-bottom"></div>
+    <div class="grain"></div>
+    <div class="vignette"></div>
+
+    <div id="chyron" class="chyron hidden">
+      <div class="chyron-brand">DRAFT NIGHT '26</div>
+      <div class="chyron-text" id="chyronText"></div>
+    </div>
+
+    <div id="board" class="board hidden">
+      <div class="board-title" id="boardTitle">DRAFT ORDER</div>
+      <div class="board-slots" id="boardSlots"></div>
+    </div>
+  </div>
+
+  <!-- Waiting room / pre-show -->
+  <div id="waitingRoom" class="overlay">
+    <div class="wr-inner">
+      <div class="wr-brand">DRAFT NIGHT '26</div>
+      <h1 id="wrLeague" class="wr-league"></h1>
+      <div id="wrSealed" class="wr-sealed hidden">
+        <span class="seal-icon">🔒</span> SEALED <span id="wrSealedDate"></span>
+        <div class="wr-hash" id="wrHash"></div>
+      </div>
+      <div id="wrCountdown" class="wr-countdown hidden">
+        <div class="wr-countdown-label">The broadcast begins in</div>
+        <div class="wr-countdown-clock" id="wrClock">--:--:--</div>
+      </div>
+      <div id="wrManualNote" class="wr-note hidden">The broadcast begins when your commissioner starts it.</div>
+      <div id="wrLiveNote" class="wr-note wr-live hidden">&#9679; LIVE NOW</div>
+      <button id="joinBtn" class="wr-join">JOIN THE BROADCAST</button>
+      <div class="wr-hint">Sound on. Everyone watching sees the same picks at the same moment.</div>
+
+      <div id="hostPanel" class="host-panel hidden">
+        <div class="host-title">Commissioner controls</div>
+        <button id="hostStartBtn" class="host-btn hidden">START THE BROADCAST NOW</button>
+        <div id="hostSchedule" class="host-schedule hidden">
+          <label for="hostTimeInput">Broadcast time</label>
+          <input type="datetime-local" id="hostTimeInput">
+          <button id="hostTimeSave" class="host-btn-secondary">Save time</button>
+          <label for="hostGapSelect" style="margin-top:12px;">Time between picks</label>
+          <select id="hostGapSelect">
+            <option value="0">Rapid fire (no break)</option>
+            <option value="30">30 seconds</option>
+            <option value="60">1 minute</option>
+            <option value="120">2 minutes</option>
+            <option value="300">5 minutes</option>
+          </select>
+          <button id="hostGapSave" class="host-btn-secondary">Save pacing</button>
+        </div>
+        <div id="hostMsg" class="host-msg"></div>
+      </div>
+
+      <div id="newPurchase" class="new-purchase hidden">
+        <div class="np-title">You're locked in.</div>
+        <p>The order is sealed. Nobody can see it or change it, you included. Send your league this link:</p>
+        <div class="np-linkrow">
+          <input type="text" id="shareLink" readonly>
+          <button id="copyLink" class="host-btn-secondary">Copy</button>
+        </div>
+        <p class="np-warn">The page you're on right now is your commissioner link. It carries your controls, so keep it to yourself and share only the link above.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- End screen -->
+  <div id="endScreen" class="overlay hidden">
+    <div class="wr-inner">
+      <div class="wr-brand">DRAFT NIGHT '26</div>
+      <h2 id="endLeague" class="wr-league"></h2>
+      <div class="end-board" id="endBoard"></div>
+      <div class="end-actions">
+        <button id="replayBtn" class="wr-join">WATCH THE REPLAY</button>
+        <button id="endShare" class="host-btn-secondary">Copy replay link</button>
+      </div>
+      <div class="end-footer">
+        Run your own league's lottery at <a href="https://www.fantasydraftlottery.com">fantasydraftlottery.com</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="loadError" class="overlay hidden">
+    <div class="wr-inner">
+      <h1>Broadcast not found</h1>
+      <p class="wr-note">Check the link with your commissioner, or head back to <a href="/">Fantasy Draft Lottery</a>.</p>
+    </div>
+  </div>
+
+  <audio id="bedMusic" loop preload="auto"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script src="reveal.js?v=4"></script>
+</body>
+</html>

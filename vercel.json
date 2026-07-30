@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "api/finalize.js": {
+      "maxDuration": 60
+    }
+  },
+  "redirects": [
+    {
+      "source": "/.planning/:path*",
+      "destination": "/",
+      "permanent": false
+    }
+  ]
+}

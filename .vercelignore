@@ -1,0 +1,7 @@
+# Internal build notes, research, keyframes and source clips. These are kept in
+# git but must never ship: this is a static site, so anything deployed is world
+# readable, and .planning/ holds the build log, account ids and handoff docs.
+.planning
+
+# Local tooling — regenerates demo VO / audio previews, never runs in prod.
+tools

@@ -1,1 +1,11 @@
 .vercel
+.env.local
+.env
+.DS_Store
+
+# Intermediate Draft Night art: ~41MB of Seedance keyframe stills and raw test
+# clips. The finished, deployed videos live in broadcast/ and ARE committed;
+# these are just the sources they were rendered from. Kept on disk, out of git
+# history — drop these two lines if you'd rather have them backed up.
+.planning/unknowns/draft-night-broadcast/keyframes/
+.planning/unknowns/draft-night-broadcast/clips/

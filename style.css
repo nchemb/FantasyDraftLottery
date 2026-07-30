@@ -141,10 +141,12 @@ input[type="text"]#league_name {
   padding: 12px 32px;
   font-weight: 600;
   font-size: 1.05rem;
+  line-height: 1.5;
   letter-spacing: 0.3px;
   transition: transform 0.15s, box-shadow 0.2s;
   margin-top: 16px;
-  margin-bottom: 50px;
+  margin-bottom: 16px;
+  vertical-align: middle;
 }
 
 .generateOrder:hover,
@@ -449,5 +451,76 @@ audio {
 
   .fdl-input {
     font-size: 0.8rem;
+  }
+}
+
+/* === Premium Sealed Reveal === */
+.premiumReveal {
+  background: linear-gradient(110deg, #b8860b 0%, #f5c542 35%, #ffe9a3 50%, #f5c542 65%, #b8860b 100%);
+  background-size: 200% 100%;
+  color: #2b1d00;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+  margin-top: 16px;
+  margin-left: 12px;
+  margin-bottom: 16px;
+  vertical-align: middle;
+  transition: transform 0.15s, box-shadow 0.2s;
+  animation: premiumShimmer 3s linear infinite, premiumFlash 2.2s ease-in-out infinite;
+}
+
+.premiumReveal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(245, 197, 66, 0.45);
+  color: #2b1d00;
+}
+
+@keyframes premiumShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes premiumFlash {
+  0%, 100% { box-shadow: 0 0 6px rgba(245, 197, 66, 0.35); }
+  50% { box-shadow: 0 0 24px rgba(245, 197, 66, 0.85); }
+}
+
+.premium-subtext {
+  color: #8a7327;
+  font-size: 0.9rem;
+  margin: 0 0 6px;
+}
+
+.premium-details {
+  max-width: 620px;
+  margin: 0 0 40px;
+  font-size: 0.92rem;
+}
+
+.premium-details summary {
+  cursor: pointer;
+  color: #b8860b;
+  font-weight: 600;
+}
+
+.premium-details p {
+  margin-top: 8px;
+  color: #555;
+}
+
+@media (max-width: 576px) {
+  .generateOrder,
+  #submit,
+  .premiumReveal {
+    margin-left: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+    width: 100%;
   }
 }

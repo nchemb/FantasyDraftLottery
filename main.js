@@ -69,6 +69,31 @@ $(document).ready(function() {
           window.location.href='draftResults.html';
         });
 
+        //DRAFT NIGHT '26 CLICK — stash the form, head to the broadcast page
+        $('#premiumReveal').click(function() {
+          var weighted = $('input[type="checkbox"]').is(":checked");
+          var teams = [];
+
+          for(var i=1; i<=numOfTeams; i++) {
+            teams.push({
+              name: ($('#team'+i).val() || '').trim(),
+              weight: weighted ? Number($('#teamWeight'+i).val()) : 1
+            });
+          }
+
+          var league = ($('#league_name').val() || '').trim();
+          var complete = league && teams.length >= 2 && teams.every(function(t){ return t.name; });
+
+          if (complete) {
+            localStorage.setItem('fdl_dn_league', JSON.stringify({
+              leagueName: league,
+              teams: teams,
+              weighted: weighted
+            }));
+          }
+          window.location.href = 'draft-night.html';
+        });
+
 
 /*****FUNCTIONS *****/
 
