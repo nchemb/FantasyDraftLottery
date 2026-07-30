@@ -117,10 +117,14 @@ const ORDINALS = [
 ];
 
 // VO only ever speaks a cleaned version of a team name; the board shows the raw one.
+// Letters are matched as \p{L}/\p{M}, NOT \w — \w is ASCII-only, so it ate the
+// accents and turned "José" into "JOS" and "Señor Muñoz" into "SE OR MU OZ"
+// while the board still displayed them correctly. Brackets stay excluded so a
+// team name can never inject an eleven_v3 delivery tag.
 function sanitizeForVO(name) {
   return name
     .replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, "")
-    .replace(/[^\w\s.,'!&-]/g, " ")
+    .replace(/[^\p{L}\p{M}\p{N}\s.,'!&-]/gu, " ")
     .replace(/\s+/g, " ")
     .trim() || "this team";
 }
@@ -163,6 +167,15 @@ async function elevenLabsTts(text) {
     await new Promise((ok) => setTimeout(ok, 800 * Math.pow(2, attempt)));
   }
   throw new Error(lastErr);
+}
+
+// We request mp3_44100_128, which is constant bitrate, so byte length gives the
+// duration outright: 128kbit/s = 16000 bytes/s. Measured against ffprobe across
+// clips of 8-13s this runs 50-80ms long (the header), i.e. it never under-reports,
+// which is the safe direction for sizing a segment. Lets the player fit the
+// timeline to the real audio without shipping an audio decoder into a function.
+function mp3DurationMs(buf) {
+  return Math.round((buf.length / 16000) * 1000);
 }
 
 // Runs jobs with a bounded worker pool. A 32-team league is 33 TTS calls;
@@ -254,6 +267,7 @@ module.exports = {
   ORDINALS,
   sanitizeForVO,
   elevenLabsTts,
+  mp3DurationMs,
   mapWithConcurrency,
   storageUpload,
   showStartOf,

@@ -38,27 +38,35 @@ function dur(file) {
 }
 
 // Walk the same timeline buildSegments() produces (gap 0) and note each VO cue.
-function cues() {
+// Segment sizing mirrors reveal.js's fit(): a slot always outlasts its own VO.
+const fit = (base, d, tail) => (d ? Math.max(base, d + tail) : base);
+
+function cues(ms) {
   const out = [];
   let t = 0;
   out.push({ at: t, file: "intro.mp3" });
-  t += COLD_OPEN;
+  t += fit(COLD_OPEN, ms["intro.mp3"], 1500);
   for (let pick = N; pick >= 3; pick--) {
     out.push({ at: t, file: `pick-${pick}.mp3` });
-    t += PER_PICK;
+    t += fit(PER_PICK, ms[`pick-${pick}.mp3`], 2500);
   }
   out.push({ at: t, file: "two-remain.mp3" });
-  t += TWO_REMAIN;
+  t += fit(TWO_REMAIN, ms["two-remain.mp3"], 1000);
   out.push({ at: t, file: "pick-2.mp3" });
-  t += PER_PICK;
+  t += fit(PER_PICK, ms["pick-2.mp3"], 2500);
   out.push({ at: t + FINAL_VO_AT, file: "pick-1.mp3" });
-  t += FINAL_PICK;
+  const slamAt = FINAL_VO_AT + Math.max(0, ms["pick-1.mp3"] - 1500);
+  t += Math.max(FINAL_PICK, slamAt + 6500);
   return { cues: out, total: t };
 }
 
 function main() {
   const outFile = process.argv[2] || path.join(ROOT, ".planning", "unknowns", "draft-night-broadcast", "demo-mix-preview.mp3");
-  const { cues: list, total } = cues();
+  const files = ["intro.mp3", "two-remain.mp3", ...Array.from({ length: N }, (_, i) => `pick-${i + 1}.mp3`)];
+  const ms = {};
+  for (const f of files) ms[f] = Math.round(dur(path.join(DEMO, f)) * 1000);
+
+  const { cues: list, total } = cues(ms);
   const totalSec = total / 1000;
 
   for (const c of list) c.dur = dur(path.join(DEMO, c.file));

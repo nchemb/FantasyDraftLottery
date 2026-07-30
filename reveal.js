@@ -68,6 +68,8 @@
   var PER_PICK_QUICK = 11000;
   var TWO_REMAIN = 7000;
   var FINAL_PICK = 21000;
+  var FINAL_VO_AT = 7500;   // silence, then the call
+  var FINAL_SLAM = 14500;   // fallback cue when clip length is unknown
 
   var $ = function (id) { return document.getElementById(id); };
 
@@ -114,10 +116,27 @@
         5: "broadcast/demo/pick-5.mp3",
         6: "broadcast/demo/pick-6.mp3",
       },
+      // Same shape finalize.js writes, so the sample is paced by the same code
+      // path as a paid show. Regenerate with tools/gen-demo-vo.js --durations.
+      dur: {
+        intro: 15337,
+        twoRemain: 5906,
+        picks: { 1: 8702, 2: 6220, 3: 8702, 4: 8231, 5: 7030, 6: 7996 },
+      },
     },
   };
 
   /* ---------- Timeline ---------- */
+
+  // Clip lengths measured at generation time, keyed the same way as the audio.
+  // Absent for chyron-only shows and for rows sealed before durations shipped,
+  // in which case every lookup returns 0 and the constants below stand alone.
+  function voDur(key, pick) {
+    var d = (data && data.audioManifest && data.audioManifest.dur) || null;
+    if (!d) return 0;
+    if (key === "pick") return (d.picks && d.picks[pick]) || 0;
+    return d[key] || 0;
+  }
 
   function buildSegments(order, gapSeconds) {
     var n = order.length;
@@ -125,6 +144,14 @@
     var gapMs = (gapSeconds || 0) * 1000;
     var segs = [];
     var t = 0;
+
+    // A segment must outlast its own VO or the announcer talks over the next
+    // pick: a 50-char team name renders ~12s against an 11s quick slot. Sizing
+    // from the manifest keeps everyone in sync because every client reads the
+    // same numbers off the same payload.
+    function fit(base, dur, tail) {
+      return dur ? Math.max(base, dur + tail) : base;
+    }
 
     // A pacing gap = a run of ~10s atmosphere chunks, each with its own clip,
     // so late joiners land on the right shot and everyone rotates in lockstep.
@@ -149,26 +176,44 @@
       }
     }
 
-    segs.push({ start: t, dur: COLD_OPEN, type: "coldOpen" });
-    t += COLD_OPEN;
+    var coldOpen = fit(COLD_OPEN, voDur("intro"), 1500);
+    segs.push({ start: t, dur: coldOpen, type: "coldOpen" });
+    t += coldOpen;
 
+    // 2.5s tail so the board slam and the crowd cutaway still land after the call.
     for (var pick = n; pick >= 3; pick--) {
-      segs.push({ start: t, dur: perPick, type: "pick", pick: pick, team: order[pick - 1] });
-      t += perPick;
+      var d = fit(perPick, voDur("pick", pick), 2500);
+      segs.push({ start: t, dur: d, type: "pick", pick: pick, team: order[pick - 1] });
+      t += d;
       pushGap(pick - 1);
     }
 
-    segs.push({ start: t, dur: TWO_REMAIN, type: "twoRemain" });
-    t += TWO_REMAIN;
+    var twoRem = fit(TWO_REMAIN, voDur("twoRemain"), 1000);
+    segs.push({ start: t, dur: twoRem, type: "twoRemain" });
+    t += twoRem;
 
     if (n >= 2) {
-      segs.push({ start: t, dur: perPick, type: "pick", pick: 2, team: order[1] });
-      t += perPick;
+      var d2 = fit(perPick, voDur("pick", 2), 2500);
+      segs.push({ start: t, dur: d2, type: "pick", pick: 2, team: order[1] });
+      t += d2;
       pushGap(1);
     }
 
-    segs.push({ start: t, dur: FINAL_PICK, type: "finalPick", pick: 1, team: order[0] });
-    t += FINAL_PICK;
+    // The name lands near the end of the call, so the slam (and the confetti with
+    // it) has to key off the clip length -- a fixed cue only ever matches one
+    // name length, and this is the moment the whole product is selling.
+    var finalVo = voDur("pick", 1);
+    var slamAt = finalVo ? FINAL_VO_AT + Math.max(0, finalVo - 1500) : FINAL_SLAM;
+    var finalDur = Math.max(FINAL_PICK, slamAt + 6500);
+    segs.push({
+      start: t,
+      dur: finalDur,
+      type: "finalPick",
+      pick: 1,
+      team: order[0],
+      slamAt: slamAt,
+    });
+    t += finalDur;
 
     segs.push({ start: t, dur: Infinity, type: "end" });
     totalDur = t;
@@ -341,10 +386,10 @@
       case "finalPick":
         setClip(podiumFor(1), true, "cam-push");
         chyron("THE FIRST OVERALL PICK…");
-        scheduleWithinSeg(seg, 7500, elapsedInSeg, function () {
+        scheduleWithinSeg(seg, FINAL_VO_AT, elapsedInSeg, function () {
           playVO("pick1");
         });
-        scheduleWithinSeg(seg, 14500, elapsedInSeg, function () {
+        scheduleWithinSeg(seg, seg.slamAt || FINAL_SLAM, elapsedInSeg, function () {
           fillSlot(1, seg.team, { animate: true, gold: true });
           chyron("1ST OVERALL: " + seg.team.toUpperCase());
           setClip("confetti", false);

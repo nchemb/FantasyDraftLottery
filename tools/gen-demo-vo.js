@@ -10,7 +10,7 @@
  */
 const fs = require("fs");
 const path = require("path");
-const { elevenLabsTts, mapWithConcurrency } = require("../api/_lib");
+const { elevenLabsTts, mapWithConcurrency, mp3DurationMs } = require("../api/_lib");
 const { voScript } = require("../api/finalize");
 
 // Must stay in sync with DEMO_DATA in reveal.js.
@@ -44,15 +44,29 @@ async function main() {
   ];
 
   const started = Date.now();
+  const durs = {};
   await mapWithConcurrency(jobs, 3, async (job) => {
     const t0 = Date.now();
     const buf = await elevenLabsTts(job.text);
     fs.writeFileSync(path.join(OUT, job.file), buf);
+    durs[job.file] = mp3DurationMs(buf);
     console.log(
-      `  ${job.file.padEnd(16)} ${String(buf.length).padStart(7)} bytes  ${Date.now() - t0}ms`
+      `  ${job.file.padEnd(16)} ${String(buf.length).padStart(7)} bytes  ` +
+        `${String(durs[job.file]).padStart(6)}ms  (${Date.now() - t0}ms)`
     );
   });
   console.log(`\n${jobs.length} clips in ${((Date.now() - started) / 1000).toFixed(1)}s`);
+
+  // Paste into DEMO_DATA.audioManifest.dur in reveal.js so the demo is paced
+  // by the same numbers a paid show gets from the manifest.
+  const picks = {};
+  Object.keys(durs)
+    .filter((f) => f.startsWith("pick-"))
+    .forEach((f) => (picks[Number(f.match(/\d+/)[0])] = durs[f]));
+  console.log("\ndur: " + JSON.stringify(
+    { intro: durs["intro.mp3"], twoRemain: durs["two-remain.mp3"], picks },
+    null, 2
+  ));
 }
 
 main().catch((err) => {

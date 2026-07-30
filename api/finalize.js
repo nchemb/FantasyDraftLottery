@@ -7,6 +7,7 @@ const {
   ORDINALS,
   sanitizeForVO,
   elevenLabsTts,
+  mp3DurationMs,
   mapWithConcurrency,
   storageUpload,
 } = require("./_lib");
@@ -60,17 +61,28 @@ async function generateAudioManifest(row, order) {
   try {
     const lines = voScript(row.league_name, order);
     const prefix = `${row.reveal_id}/${crypto.randomBytes(6).toString("base64url")}`;
-    const manifest = { picks: {} };
+    // dur = how long each clip actually runs. The player sizes its segments from
+    // these so a long team name can't make the announcer talk over the next pick,
+    // and so the #1-pick confetti lands on the name however long it takes to say.
+    const manifest = { picks: {}, dur: { picks: {} } };
 
     const jobs = [
-      { file: "intro.mp3", text: lines.intro, set: (url) => (manifest.intro = url) },
-      { file: "two-remain.mp3", text: lines.twoRemain, set: (url) => (manifest.twoRemain = url) },
+      {
+        file: "intro.mp3",
+        text: lines.intro,
+        set: (url, ms) => { manifest.intro = url; manifest.dur.intro = ms; },
+      },
+      {
+        file: "two-remain.mp3",
+        text: lines.twoRemain,
+        set: (url, ms) => { manifest.twoRemain = url; manifest.dur.twoRemain = ms; },
+      },
     ];
     for (const pick of Object.keys(lines.picks)) {
       jobs.push({
         file: `pick-${pick}.mp3`,
         text: lines.picks[pick],
-        set: (url) => (manifest.picks[pick] = url),
+        set: (url, ms) => { manifest.picks[pick] = url; manifest.dur.picks[pick] = ms; },
       });
     }
 
@@ -78,7 +90,8 @@ async function generateAudioManifest(row, order) {
     // at once trips the ElevenLabs concurrency cap.
     await mapWithConcurrency(jobs, TTS_CONCURRENCY, async (job) => {
       const buf = await elevenLabsTts(job.text);
-      job.set(await storageUpload(`${prefix}/${job.file}`, buf, "audio/mpeg"));
+      const url = await storageUpload(`${prefix}/${job.file}`, buf, "audio/mpeg");
+      job.set(url, mp3DurationMs(buf));
     });
     return manifest;
   } catch (err) {

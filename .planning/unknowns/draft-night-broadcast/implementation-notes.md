@@ -93,6 +93,34 @@ returns no order/audio → host auth matrix (403 no token / 403 wrong token / 40
 (an MDN reference mp4 also stalls at readyState 0), so this is the third session that could
 not eyeball the video layer. Needs Neej's own browser.
 
+## Round 4 (2026-07-30, adversarial team-name pass)
+
+Asked "what happens with 32 teams and garbage names" — tested rather than reasoned, found two
+real defects.
+
+- **`sanitizeForVO` ate accents.** `\w` is ASCII-only, so `José` was announced as "JOS" and
+  `Señor Muñoz` as "SE OR MU OZ", while the board displayed them correctly. Non-Latin scripts
+  (Japanese, Cyrillic) collapsed to the "this team" fallback entirely. Now matches
+  `\p{L}\p{M}\p{N}` with `/u`. Brackets stay excluded, so tag injection is still impossible.
+- **Long names overran their slot.** `xXx_420_N0SC0PE_xXx` renders **11.9s** and gibberish at
+  the 50-char cap hit **14.1s**, against an 11s quick slot — the announcer talks over the next
+  pick. Fixed properly rather than by padding constants: `mp3DurationMs()` derives each clip's
+  true length from its byte count (mp3_44100_128 is CBR, so bytes/16000 = seconds; measured
+  50-80ms long vs ffprobe, i.e. never under-reports), finalize stores it in
+  `audio_manifest.dur`, and the player sizes every segment as `max(base, dur + tail)`. Sync is
+  preserved because all clients read the same numbers off the same payload. Falls back to the
+  old constants when `dur` is absent (chyron-only, or rows sealed before this).
+- Same fix corrected the **#1-pick confetti**, which fired at a hardcoded 14.5s and therefore
+  only matched a ~8.6s call. The slam now derives from clip length, so it lands on the name
+  whatever the team is called.
+
+Gibberish itself is a non-issue — `alsdkfjalsfj` is pronounced and nothing breaks.
+
+**Worst-case verified end to end** (32 teams, adversarial names incl. the 50-char cap):
+34 clips in **35.8s** against the 60s budget, 5.2MB audio, 5,138 chars billed (~70 such
+leagues per month on the current 363k plan), **0 overruns**, 7.2 min show at gap 0, confetti
+at +20.1s against a VO ending +21.6s.
+
 ## Credits ledger
 5,305 (Jul 18) → 3,100 (Jul 29 start, ~2.2k spent elsewhere) → 2,903 now.
 Session spend ≈ 197 credits: 36 ('96 test clip) + ~125 (6 final clips) + ~36 (10 TTS gens).
