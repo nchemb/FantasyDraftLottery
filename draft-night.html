@@ -127,6 +127,9 @@
       border-top: 1px solid rgba(244,241,232,0.16); background: rgba(0,0,0,0.15);
     }
     .roster-edit { display: inline-block; margin-bottom: 18px; font-size: 13px; }
+    .runtime-est { margin-top: 8px; font-size: 13px; color: rgba(244,241,232,0.65); }
+    .runtime-est strong { color: var(--gold); }
+    .runtime-est.long { color: #f0c98a; }
     .mode-row { margin: 14px 0; }
     .mode-row label { display: block; padding: 10px 12px; border: 1px solid rgba(244,241,232,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
     .mode-row label.selected { border-color: var(--gold); background: rgba(245,197,66,0.07); }
@@ -221,12 +224,13 @@
           <div class="mode-row">
             <label for="gapSelect" style="border:none; padding:0 0 4px; margin:0; cursor:default;">Time between picks</label>
             <select id="gapSelect" style="width:100%; background:#101a30; border:1px solid rgba(244,241,232,0.25); color:var(--white); border-radius:5px; padding:12px; font-family:inherit; font-size:15px;">
-              <option value="0" selected>Rapid fire (no break, about 3 minutes total)</option>
+              <option value="0" selected>Rapid fire (no break between picks)</option>
               <option value="30">30 seconds between picks</option>
               <option value="60">1 minute between picks</option>
               <option value="120">2 minutes between picks</option>
               <option value="300">5 minutes between picks (full draft-party mode)</option>
             </select>
+            <div id="runtimeEst" class="runtime-est"></div>
           </div>
           <button class="btn-gold buy-cta" id="buyBtn">Seal my order &amp; get my links · $9</button>
           <div class="buy-fine">One-time payment per league. Secure checkout through Stripe. If anything goes wrong with your broadcast, email nchemb@gmail.com and we'll fix it or refund you.</div>
@@ -354,6 +358,44 @@
         var d = new Date(Date.now() + 24 * 60 * 60 * 1000);
         d.setMinutes(0, 0, 0);
         schedInput.value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      }
+
+      // Runtime depends on team count as much as on the gap: 32 teams at the
+      // 5-minute setting is a 2.7-hour broadcast. A fixed "about 3 minutes" in
+      // the option label was only ever true for a ~12-team league, so quote the
+      // real number for THIS league and flag the long ones before they pay.
+      var gapSelect = document.getElementById("gapSelect");
+      var runtimeEst = document.getElementById("runtimeEst");
+
+      function estimateRuntime(teamCount, gapSeconds) {
+        // Mirrors buildSegments(): 17s cold open + 7s two-remain + 21s final,
+        // then (n-1) picks and (n-1) gaps.
+        var perPick = teamCount > 16 ? 11 : 12;
+        return 45 + (teamCount - 1) * perPick + (teamCount - 1) * gapSeconds;
+      }
+
+      function fmtRuntime(sec) {
+        if (sec < 90) return "about a minute";
+        var m = Math.round(sec / 60);
+        if (m < 60) return "about " + m + " minutes";
+        var h = Math.floor(m / 60), rem = m % 60;
+        return "about " + h + (h === 1 ? " hour" : " hours") + (rem ? " " + rem + " min" : "");
+      }
+
+      function updateRuntime() {
+        if (!valid || !runtimeEst) return;
+        var sec = estimateRuntime(stored.teams.length, Number(gapSelect.value));
+        var long = sec > 45 * 60;
+        runtimeEst.className = "runtime-est" + (long ? " long" : "");
+        runtimeEst.innerHTML =
+          stored.teams.length + " teams at this pacing runs <strong>" +
+          fmtRuntime(sec) + "</strong>" +
+          (long ? " — that's a full draft party. Pick a shorter gap if you want it over quickly." : ".");
+      }
+
+      if (gapSelect) {
+        gapSelect.addEventListener("change", updateRuntime);
+        updateRuntime();
       }
 
       var radios = document.querySelectorAll('input[name="mode"]');
