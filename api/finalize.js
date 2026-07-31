@@ -24,7 +24,7 @@ function errorPage(res, code, message) {
     `<!doctype html><html><head><title>Fantasy Draft Lottery</title></head>` +
       `<body style="font-family:sans-serif;background:#0b1220;color:#fff;text-align:center;padding:4rem 1rem;">` +
       `<h1>Something went wrong</h1><p>${message}</p>` +
-      `<p>If you were charged, your broadcast is safe — email <a style="color:#f5c542" href="mailto:nchemb@gmail.com">nchemb@gmail.com</a> with your league name and we'll sort it out.</p>` +
+      `<p>If you were charged, your broadcast is safe — email <a style="color:#f5c542" href="mailto:neej@buildwithneej.com">neej@buildwithneej.com</a> with your league name and we'll sort it out.</p>` +
       `<p><a style="color:#f5c542" href="/">Back to Fantasy Draft Lottery</a></p></body></html>`
   );
 }
