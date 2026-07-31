@@ -38,6 +38,43 @@ $(document).ready(function() {
         //Initial hiding of weights
         hideWeights();
 
+        // Bring back whatever they last entered. Without this, "Edit teams or
+        // weights" on the broadcast page dumped them on an empty form and they
+        // had to retype the whole league, which is the fastest way to lose a sale.
+        function restoreSavedLeague() {
+          var saved = null;
+          try { saved = JSON.parse(localStorage.getItem('fdl_dn_league') || 'null'); } catch (e) {}
+          if (!saved || !Array.isArray(saved.teams) || saved.teams.length < 2) return false;
+
+          var n = Math.min(Math.max(saved.teams.length, 2), 32);
+          if (String(n) !== String($('#numberOfTeams').val())) {
+            $('#numberOfTeams').val(String(n)).trigger('change');
+          }
+          if (saved.leagueName) $('#league_name').val(saved.leagueName);
+
+          if (saved.weighted) {
+            $('input[type="checkbox"]').prop('checked', true);
+            $('.classWeight').show();
+          }
+          saved.teams.forEach(function (t, i) {
+            if (t && t.name) $('#team' + (i + 1)).val(t.name);
+            var w = Number(t && t.weight);
+            $('#teamWeight' + (i + 1)).val(Number.isFinite(w) && w > 0 ? w : 1);
+          });
+          $('#resetLeague').show();
+          return true;
+        }
+        restoreSavedLeague();
+
+        // Deliberately small: restoring their work is the common case, starting
+        // over is the rare one.
+        $('#resetLeague').click(function (e) {
+          e.preventDefault();
+          if (!confirm('Clear all team names and weights and start over?')) return;
+          try { localStorage.removeItem('fdl_dn_league'); } catch (e2) {}
+          location.href = location.pathname;
+        });
+
         $('input[type="checkbox"]').click(function(){
           $('.classWeight').toggle();
         });

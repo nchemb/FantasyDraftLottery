@@ -267,6 +267,29 @@ audio {
 }
 
 /* === Footer === */
+/* Intentionally understated. Restoring their league is the common path;
+   wiping it is rare and destructive, so it shouldn't compete for attention. */
+.reset-league {
+  display: inline-block;
+  margin-left: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  vertical-align: middle;
+}
+
+.reset-league:hover {
+  color: #b00020;
+}
+
+@media (max-width: 576px) {
+  .reset-league {
+    display: block;
+    margin: 0.75rem 0 0;
+    text-align: center;
+  }
+}
+
 .site-footer {
   text-align: center;
   padding: 1.5rem 0;
