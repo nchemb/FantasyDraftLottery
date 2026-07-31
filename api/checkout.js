@@ -47,6 +47,10 @@ module.exports = async function handler(req, res) {
 
     const session = await stripe("checkout/sessions", {
       mode: "payment",
+      // Stripe's Adaptive Pricing is on by default: it geolocates the buyer and
+      // puts a currency chooser above the card form. On a $9 US fantasy football
+      // product that reads as a scam, so pin it to the one price we quote.
+      "adaptive_pricing[enabled]": "false",
       client_reference_id: row.id,
       "metadata[reveal_uuid]": row.id,
       "line_items[0][quantity]": "1",
