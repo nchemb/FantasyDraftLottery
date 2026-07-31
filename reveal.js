@@ -60,6 +60,9 @@
   // while he's talking. 0.08 measured 22.5 dB under — effectively inaudible.
   var BED_VOLUME = 0.28;
   var BED_DUCKED = 0.12;
+  // Louder while everyone's sitting on the countdown — nothing to compete with,
+  // and it turns the wait into part of the show. Settles back at kickoff.
+  var BED_WAITING = 0.5;
 
   // Pacing (ms). Quick mode kicks in past 16 teams so a 32-team show stays sane.
   // Each segment must outlast its VO clip — VO isn't truncated at a segment
@@ -249,6 +252,43 @@
 
   function bed() { return $("bedMusic"); }
 
+  // iOS Safari treats HTMLMediaElement.volume as read-only: assigning to it is
+  // silently ignored, so on a phone the bed played at full volume and never
+  // ducked under the announcer. Routing it through a WebAudio gain node gives
+  // real volume control on iOS. Only the bed goes through the graph — the
+  // announcer clips are cross-origin and would need CORS headers to be routed,
+  // and they don't need volume control anyway.
+  var audioCtx = null, bedGain = null;
+
+  function setupBedAudio() {
+    if (bedGain) return true;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    try {
+      audioCtx = new AC();
+      var src = audioCtx.createMediaElementSource(bed());
+      bedGain = audioCtx.createGain();
+      src.connect(bedGain);
+      bedGain.connect(audioCtx.destination);
+      return true;
+    } catch (e) {
+      audioCtx = null;
+      bedGain = null;
+      return false;
+    }
+  }
+
+  // Ramped rather than stepped so ducking sounds like a mixer, not a switch.
+  function setBedVolume(v) {
+    if (bedGain && audioCtx) {
+      try {
+        bedGain.gain.setTargetAtTime(v, audioCtx.currentTime, 0.12);
+        return;
+      } catch (e) {}
+    }
+    bed().volume = v;
+  }
+
   function voEl() { return $("voPlayer"); }
 
   // Store urls, not Audio objects. Playback goes through the one element that
@@ -280,13 +320,13 @@
     if (!url) return;
     var a = voEl();
     ducking++;
-    bed().volume = BED_DUCKED;
+    setBedVolume(BED_DUCKED);
     var done = false;
     var restore = function () {
       if (done) return;
       done = true;
       ducking = Math.max(0, ducking - 1);
-      if (!ducking) bed().volume = BED_VOLUME;
+      if (!ducking) setBedVolume(BED_VOLUME);
     };
     a.onended = restore;
     a.onerror = restore;
@@ -483,7 +523,9 @@
     preloadAudio(data.audioManifest);
     var b = bed();
     if (b.src) {
-      b.volume = BED_VOLUME;
+      // Already playing from the JOIN tap; kickoff just settles it back from
+      // the louder countdown level so the announcer sits on top.
+      setBedVolume(BED_VOLUME);
       var p = b.play();
       if (p && p.catch) p.catch(function () {});
     }
@@ -502,7 +544,7 @@
     var v = voEl();
     try { v.pause(); } catch (e) {}
     ducking = 0;
-    b.volume = BED_VOLUME;
+    setBedVolume(BED_VOLUME);
     $("endLeague").textContent = data.leagueName;
     var eb = $("endBoard");
     eb.innerHTML = "";
@@ -618,8 +660,14 @@
       // The bed keeps PLAYING silently through the countdown rather than being
       // paused and restarted: pausing meant a 4MB re-buffer at showtime, which
       // is why the music used to arrive late.
+      // The music starting the instant you join is the moment the wait becomes
+      // part of the show, so it plays out loud here rather than silently.
       var b = bed();
-      b.volume = 0;
+      setupBedAudio();
+      if (audioCtx && audioCtx.state === "suspended") {
+        try { audioCtx.resume(); } catch (e) {}
+      }
+      setBedVolume(BED_WAITING);
       var bp = b.play();
       if (bp && bp.catch) bp.catch(function () {});
 
@@ -743,5 +791,13 @@
       });
   }
 
-  document.addEventListener("DOMContentLoaded", boot);
+  // Guard against a second boot: it would double-bind every control, so a
+  // single JOIN tap would run the handler twice and leave the bed at the loud
+  // countdown level for the whole show.
+  var booted = false;
+  document.addEventListener("DOMContentLoaded", function () {
+    if (booted) return;
+    booted = true;
+    boot();
+  });
 })();
