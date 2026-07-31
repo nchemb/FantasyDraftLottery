@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex">
   <title>Draft Night '26 — Live Draft Reveal</title>
   <link rel="icon" href="https://img.icons8.com/offices/30/000000/trophy.png">
-  <link rel="stylesheet" href="reveal.css?v=4">
+  <link rel="stylesheet" href="reveal.css?v=5">
 </head>
 <body>
 
@@ -69,13 +69,13 @@
       </div>
 
       <div id="newPurchase" class="new-purchase hidden">
-        <div class="np-title">You're locked in.</div>
-        <p>The order is sealed. Nobody can see it or change it, you included. Send your league this link:</p>
+        <div class="np-title" id="npTitle">You're locked in.</div>
+        <p id="npIntro">The order is sealed. Nobody can see it or change it, you included. Send your league this link:</p>
         <div class="np-linkrow">
           <input type="text" id="shareLink" readonly>
           <button id="copyLink" class="host-btn-secondary">Copy</button>
         </div>
-        <p class="np-warn">The page you're on right now is your commissioner link. It carries your controls, so keep it to yourself and share only the link above.</p>
+        <p class="np-warn">Don't send the link in your address bar — that one is yours. It carries the commissioner controls, so anyone who opens it could start your broadcast early.</p>
       </div>
     </div>
   </div>
@@ -106,6 +106,6 @@
   <audio id="bedMusic" loop preload="auto"></audio>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-  <script src="reveal.js?v=4"></script>
+  <script src="reveal.js?v=5"></script>
 </body>
 </html>

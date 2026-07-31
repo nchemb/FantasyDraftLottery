@@ -674,9 +674,18 @@
     fetchReveal()
       .then(function (d) {
         renderWaitingRoom();
-        if (IS_NEW && HOST_TOKEN) {
+        // Show the share link on EVERY commissioner visit, not just the one
+        // right after checkout. A host returning from history has the token in
+        // their address bar and no viewer link on screen, so the obvious move is
+        // to copy the URL — which would hand the whole league the start button.
+        if (HOST_TOKEN) {
           $("newPurchase").classList.remove("hidden");
           $("shareLink").value = location.origin + location.pathname + "?id=" + encodeURIComponent(d.revealId);
+          if (!IS_NEW) {
+            $("npTitle").textContent = "Your league's link";
+            $("npIntro").textContent =
+              "This is the link to send everyone. It plays the broadcast without any controls.";
+          }
         }
         if (HOST_TOKEN) {
           if (d.scheduledAt) {
