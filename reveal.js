@@ -278,6 +278,42 @@
     }
   }
 
+  // Everything iOS requires a user gesture for, in one place. MUST be called
+  // synchronously from inside a click handler — a promise callback or a timer
+  // is too late, the gesture is no longer on the stack.
+  //
+  // Replay needs this as much as JOIN does: the end screen pauses the bed, iOS
+  // then suspends the AudioContext, and every later gain change goes nowhere.
+  // Desktop browsers resume the context on their own, so a broken replay only
+  // ever showed up on a phone.
+  function primeMedia(bedLevel) {
+    setupBedAudio();
+    if (audioCtx && audioCtx.state === "suspended") {
+      try { audioCtx.resume(); } catch (e) {}
+    }
+    setBedVolume(bedLevel);
+    var b = bed();
+    var bp = b.play();
+    if (bp && bp.catch) bp.catch(function () {});
+
+    // Re-unlock the announcer element on a scrap of silence. Its real urls are
+    // gated until showtime, so there's nothing else to prime it with — and
+    // without this the broadcast runs mute on iOS.
+    var v0 = voEl();
+    v0.src = SILENT_MP3;
+    v0.removeAttribute("data-src"); // force playVO to re-assign the real clip
+    var vp = v0.play();
+    if (vp && vp.then) vp.then(function () { v0.pause(); }).catch(function () {});
+
+    [$("vidA"), $("vidB")].forEach(function (v) {
+      if (!v.src) v.src = CLIPS.podium;
+      var p = v.play();
+      if (p && p.then) p.then(function () {
+        if (!playing) v.pause();
+      }).catch(function () {});
+    });
+  }
+
   // Ramped rather than stepped so ducking sounds like a mixer, not a switch.
   function setBedVolume(v) {
     if (bedGain && audioCtx) {
@@ -656,36 +692,11 @@
       joined = true;
       $("joinBtn").disabled = true;
       $("joinBtn").textContent = "JOINED — WAITING FOR KICKOFF";
-      // Prime media under the user gesture so iOS lets us drive them later.
-      // The bed keeps PLAYING silently through the countdown rather than being
-      // paused and restarted: pausing meant a 4MB re-buffer at showtime, which
-      // is why the music used to arrive late.
-      // The music starting the instant you join is the moment the wait becomes
-      // part of the show, so it plays out loud here rather than silently.
-      var b = bed();
-      setupBedAudio();
-      if (audioCtx && audioCtx.state === "suspended") {
-        try { audioCtx.resume(); } catch (e) {}
-      }
-      setBedVolume(BED_WAITING);
-      var bp = b.play();
-      if (bp && bp.catch) bp.catch(function () {});
-
-      // Unlock the announcer element on a scrap of silence. Its real urls are
-      // gated until showtime, so there is nothing else to play here — and
-      // without this the whole broadcast runs mute on iOS.
-      var v0 = voEl();
-      v0.src = SILENT_MP3;
-      var vp = v0.play();
-      if (vp && vp.then) vp.then(function () { v0.pause(); }).catch(function () {});
-
-      [$("vidA"), $("vidB")].forEach(function (v) {
-        v.src = CLIPS.podium;
-        var p = v.play();
-        if (p && p.then) p.then(function () {
-          if (!playing) v.pause();
-        }).catch(function () {});
-      });
+      // The bed keeps PLAYING through the countdown rather than being paused
+      // and restarted: pausing meant a 4MB re-buffer at showtime, which is why
+      // the music used to arrive late. Starting it the instant you join is the
+      // moment the wait becomes part of the show.
+      primeMedia(BED_WAITING);
 
       if (IS_DEMO) {
         showStart = Date.now();
@@ -705,6 +716,10 @@
       // sync to, so stop polling.
       replaying = true;
       if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      // Re-establish audio inside this click. Without it the replay ran silent
+      // on phones — the end screen had paused the bed and iOS suspended the
+      // context, and nothing here woke it back up.
+      primeMedia(BED_VOLUME);
       joined = true;
       showStart = now();
       playing = false;
