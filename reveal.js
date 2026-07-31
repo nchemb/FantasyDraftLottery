@@ -761,6 +761,11 @@
       $("wrLeague").textContent = data.leagueName + " (sample broadcast)";
       $("wrManualNote").classList.add("hidden");
       $("joinBtn").textContent = "WATCH THE SAMPLE BROADCAST";
+      // Someone who just watched the sample is as warm as they will ever be.
+      // Lead with the buy, drop the replay-link copy (there's nothing to share).
+      $("endSetup").classList.remove("hidden");
+      $("endShare").classList.add("hidden");
+      $("endFooter").textContent = "That was a sample. Yours uses your league's real team names.";
       return;
     }
 

@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex">
   <title>Draft Night '26 — Live Draft Reveal</title>
   <link rel="icon" href="https://img.icons8.com/offices/30/000000/trophy.png">
-  <link rel="stylesheet" href="reveal.css?v=7">
+  <link rel="stylesheet" href="reveal.css?v=8">
 </head>
 <body>
 
@@ -87,10 +87,13 @@
       <h2 id="endLeague" class="wr-league"></h2>
       <div class="end-board" id="endBoard"></div>
       <div class="end-actions">
+        <!-- On the sample, this is the moment someone has just felt the product.
+             Give them somewhere to go other than a grey text link. -->
+        <a id="endSetup" class="wr-join hidden" href="/?dn=1">SET UP MY LEAGUE · $9</a>
         <button id="replayBtn" class="wr-join">WATCH THE REPLAY</button>
         <button id="endShare" class="host-btn-secondary">Copy replay link</button>
       </div>
-      <div class="end-footer">
+      <div class="end-footer" id="endFooter">
         Run your own league's lottery at <a href="https://www.fantasydraftlottery.com">fantasydraftlottery.com</a>
       </div>
     </div>
@@ -111,6 +114,6 @@
   <audio id="voPlayer" preload="auto"></audio>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-  <script src="reveal.js?v=7"></script>
+  <script src="reveal.js?v=8"></script>
 </body>
 </html>

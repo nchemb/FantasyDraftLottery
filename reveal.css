@@ -287,6 +287,8 @@ html, body {
   box-shadow: 0 4px 30px rgba(245,197,66,0.35);
 }
 .wr-join:hover { filter: brightness(1.08); }
+/* .wr-join is used on an <a> for the sample's buy CTA, not just <button>. */
+a.wr-join { text-decoration: none; }
 .wr-join:disabled { opacity: 0.6; cursor: default; }
 .wr-hint {
   margin-top: 14px;
