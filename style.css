@@ -286,20 +286,60 @@ audio {
 }
 
 .site-footer-social {
-  margin-top: 0.25rem;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Icons are inline SVG rather than an icon font or CDN sprite: the footer is on
+   every page, and this costs no extra request and can't break if a CDN does. */
+.site-footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.site-footer-social a svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  display: block;
+}
+
+.site-footer-social a:hover,
+.site-footer-social a:focus-visible {
+  color: #fff;
+  background-color: var(--primary);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.site-footer-social a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.site-footer-handle {
+  display: block;
+  margin-top: 0.5rem;
   font-size: 0.85rem;
   color: var(--text-muted);
 }
 
-.site-footer-social a {
-  color: var(--text-muted);
-  text-decoration: none;
-  margin: 0 0.2rem;
-}
-
-.site-footer-social a:hover {
-  color: var(--primary);
-  text-decoration: underline;
+@media (max-width: 480px) {
+  .site-footer-social { gap: 0.15rem; }
+  .site-footer-social a { width: 38px; height: 38px; } /* thumb-sized tap target */
 }
 
 /* === Responsive === */
