@@ -51,6 +51,9 @@
     "broadcast/t8-crowd-d.mp4",
     "broadcast/t9-crowd-e.mp4",
   ];
+  // 50ms of silence, inlined so the JOIN tap has something to play the
+  // announcer element with before the real urls are released at showtime.
+  var SILENT_MP3 = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYyLjEyLjEwMgAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAABAAAAlgAenp6enp6enp6enp6enp6enp6enp6enp6pqampqampqampqampqampqampqampqamptPT09PT09PT09PT09PT09PT09PT09PT09P/////////////////////////////////AAAAAExhdmM2Mi4yOAAAAAAAAAAAAAAAACQCcQAAAAAAAAJY+/pGGwAAAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NCxKMAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
   var BED_MUSIC_URL = "broadcast/bed-music.mp3";
   // Measured against the announcer (-13.3 dB mean) via tools/render-audio-preview.js:
   // 0.28 puts the bed ~12 dB under VO (present but light), 0.12 ~19 dB under
@@ -83,9 +86,10 @@
   var tickTimer = null;
   var pollTimer = null;
   var activeVid = null;
-  var voAudio = {};         // preloaded Audio objects
+  var voAudio = {};         // pick key -> clip url
   var lastSegIndex = -1;
   var confettiFired = false;
+  var replaying = false;    // replay drives its own clock; stop syncing to the server
 
   /* ---------- Demo fixture ---------- */
 
@@ -245,13 +249,18 @@
 
   function bed() { return $("bedMusic"); }
 
+  function voEl() { return $("voPlayer"); }
+
+  // Store urls, not Audio objects. Playback goes through the one element that
+  // was unlocked during the JOIN tap; a fresh Audio() created at showtime is
+  // silently refused on iOS because no gesture is on the stack by then.
   function preloadAudio(manifest) {
     if (!manifest) return;
     var add = function (key, url) {
       if (!url) return;
-      var a = new Audio(url);
-      a.preload = "auto";
-      voAudio[key] = a;
+      voAudio[key] = url;
+      // Warm the HTTP cache so the reused element doesn't stall on first play.
+      try { new Audio(url).preload = "auto"; } catch (e) {}
     };
     add("intro", manifest.intro);
     add("twoRemain", manifest.twoRemain);
@@ -267,11 +276,11 @@
   var ducking = 0;
 
   function playVO(key) {
-    var a = voAudio[key];
-    if (!a) return;
+    var url = voAudio[key];
+    if (!url) return;
+    var a = voEl();
     ducking++;
     bed().volume = BED_DUCKED;
-    a.currentTime = 0;
     var done = false;
     var restore = function () {
       if (done) return;
@@ -281,6 +290,11 @@
     };
     a.onended = restore;
     a.onerror = restore;
+    if (a.getAttribute("data-src") !== url) {
+      a.setAttribute("data-src", url);
+      a.src = url;
+    }
+    try { a.currentTime = 0; } catch (e) {}
     var p = a.play();
     if (p && p.catch) p.catch(restore);
   }
@@ -484,6 +498,11 @@
     playing = false;
     var b = bed();
     b.pause();
+    // Otherwise a final call that is still sounding talks over the end board.
+    var v = voEl();
+    try { v.pause(); } catch (e) {}
+    ducking = 0;
+    b.volume = BED_VOLUME;
     $("endLeague").textContent = data.leagueName;
     var eb = $("endBoard");
     eb.innerHTML = "";
@@ -533,9 +552,13 @@
   }
 
   function refreshState() {
+    // Belt and braces with the clearInterval on replay: a request already in
+    // flight when the button was pressed must not stomp the replay clock.
+    if (replaying) return;
     fetch("/api/reveal-state?id=" + encodeURIComponent(REVEAL_ID))
       .then(function (r) { return r.json(); })
       .then(function (s) {
+        if (replaying) return;
         if (s.serverNow) clockOffset = Date.parse(s.serverNow) - Date.now();
         showStart = s.showStartedAt ? Date.parse(s.showStartedAt) : null;
         renderWaitingRoom();
@@ -592,16 +615,22 @@
       $("joinBtn").disabled = true;
       $("joinBtn").textContent = "JOINED — WAITING FOR KICKOFF";
       // Prime media under the user gesture so iOS lets us drive them later.
-      // These play() promises resolve a tick AFTER this handler returns, and
-      // goLive() can run synchronously below — so the unguarded pause() used to
-      // land on top of real playback and silence the bed for the whole show.
+      // The bed keeps PLAYING silently through the countdown rather than being
+      // paused and restarted: pausing meant a 4MB re-buffer at showtime, which
+      // is why the music used to arrive late.
       var b = bed();
       b.volume = 0;
       var bp = b.play();
-      if (bp && bp.then) bp.then(function () {
-        if (!playing) { b.pause(); b.currentTime = 0; }
-        b.volume = BED_VOLUME;
-      }).catch(function () { b.volume = BED_VOLUME; });
+      if (bp && bp.catch) bp.catch(function () {});
+
+      // Unlock the announcer element on a scrap of silence. Its real urls are
+      // gated until showtime, so there is nothing else to play here — and
+      // without this the whole broadcast runs mute on iOS.
+      var v0 = voEl();
+      v0.src = SILENT_MP3;
+      var vp = v0.play();
+      if (vp && vp.then) vp.then(function () { v0.pause(); }).catch(function () {});
+
       [$("vidA"), $("vidB")].forEach(function (v) {
         v.src = CLIPS.podium;
         var p = v.play();
@@ -609,7 +638,6 @@
           if (!playing) v.pause();
         }).catch(function () {});
       });
-      Object.keys(voAudio).forEach(function (k) { voAudio[k].load(); });
 
       if (IS_DEMO) {
         showStart = Date.now();
@@ -621,6 +649,14 @@
     });
 
     $("replayBtn").addEventListener("click", function () {
+      // A replay runs on a local clock. The 3s poll would overwrite showStart
+      // with the server's real showtime within one tick, put elapsed past the
+      // end of the timeline and throw the viewer straight back to this screen —
+      // which is exactly what a replay looked like before: a second of audio,
+      // then the end board again. The show is over; there is nothing left to
+      // sync to, so stop polling.
+      replaying = true;
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
       joined = true;
       showStart = now();
       playing = false;

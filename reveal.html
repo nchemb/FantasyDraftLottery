@@ -104,6 +104,11 @@
   </div>
 
   <audio id="bedMusic" loop preload="auto"></audio>
+  <!-- One reused element for the announcer. iOS only grants playback to an
+       element that has already played inside a user gesture, and the VO urls
+       don't exist until showtime, so we unlock this one on the JOIN tap and
+       re-point its src per line. Lines never overlap, so one is enough. -->
+  <audio id="voPlayer" preload="auto"></audio>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   <script src="reveal.js?v=5"></script>
