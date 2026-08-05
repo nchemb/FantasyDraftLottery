@@ -76,7 +76,9 @@ async function sendPurchaseEmail(session, row) {
       },
       body: JSON.stringify({
         from: "Neej <neej@fantasydraftlottery.com>",
-        reply_to: "neej@fantasydraftlottery.com",
+        // fantasydraftlottery.com has no MX yet — replies to it bounce. Same
+        // stopgap as the launch broadcast; swap back once the Workspace alias exists.
+        reply_to: "neej@buildwithneej.com",
         to: [email],
         subject: `Your draft night links — ${row.league_name || "Fantasy Draft Lottery"}`,
         html: html,
