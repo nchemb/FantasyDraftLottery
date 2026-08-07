@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Synchronous on purpose: sets data-pv before the body parses, so the CSS
+         below picks the arm with no flash of the wrong number on the button. -->
+    <script src="price-test.js?v=1"></script>
+    <style>
+      .pv-b { display: none; }
+      html[data-pv="b"] .pv-a { display: none; }
+      html[data-pv="b"] .pv-b { display: inline; }
+    </style>
+
     <!-- Microsoft Clarity -->
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
@@ -211,7 +220,7 @@
     </div>
     </form>
     <button type="submit" class="btn btn-primary generateOrder" id="submit">Generate Order</button>
-    <button type="button" class="btn premiumReveal" id="premiumReveal">🏈 Draft Night '26 &middot; Live Broadcast Reveal &middot; $9</button>
+    <button type="button" class="btn premiumReveal" id="premiumReveal" data-ab-cta>🏈 Draft Night '26 &middot; Live Broadcast Reveal &middot; <span class="pv-a">$9</span><span class="pv-b">$19</span></button>
     <!-- Only shown once there is saved work to clear. -->
     <a href="#" id="resetLeague" class="reset-league" style="display:none;">Start over</a>
     <p class="premium-subtext">A live announcer broadcast of your draft order &middot; sealed and tamper-proof &middot; your whole league watches together</p>

@@ -4,8 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Draft Night '26 — Live Broadcast Draft Reveal | Fantasy Draft Lottery</title>
-  <meta name="description" content="Turn your fantasy draft order reveal into a live broadcast. Sealed, tamper-proof order plus an announcer who calls every pick. $9 per league.">
+  <meta name="description" content="Turn your fantasy draft order reveal into a live broadcast. Sealed, tamper-proof order plus an announcer who calls every pick. One flat price per league.">
   <link rel="icon" href="https://img.icons8.com/offices/30/000000/trophy.png">
+  <!-- Microsoft Clarity. Was on the home page but not here, which left the one
+       page where the money happens with no session recordings or heatmaps. -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "vyv8uptea2");
+  </script>
+  <!-- Synchronous on purpose: sets data-pv before the body parses, so the CSS
+       below picks the arm with no flash of the wrong number on the hero CTA. -->
+  <script src="price-test.js?v=1"></script>
+  <style>
+    .pv-b { display: none; }
+    html[data-pv="b"] .pv-a { display: none; }
+    html[data-pv="b"] .pv-b { display: inline; }
+  </style>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -163,7 +180,7 @@
       <div class="hero-brand">FANTASY DRAFT LOTTERY PRESENTS</div>
       <h1>DRAFT NIGHT '26</h1>
       <p class="hero-sub">Your draft order reveal, run as a live broadcast. An announcer calls every pick by name while your whole league watches the board fill in, together, in real time.</p>
-      <a class="btn-gold" href="#buy">Set up my broadcast · $9</a>
+      <a class="btn-gold" href="#buy" data-ab-cta>Set up my broadcast · <span class="pv-a">$9</span><span class="pv-b">$19</span></a>
       <a class="btn-outline" href="reveal.html?demo=1" target="_blank">Watch the sample</a>
     </div>
   </div>
@@ -186,7 +203,7 @@
       <h2>How it works</h2>
       <ol class="steps">
         <li>Enter your league and team names on the <a href="/">home page</a>, then hit the Draft Night button.</li>
-        <li>Pick a broadcast time (or choose to start it yourself) and pay $9.</li>
+        <li>Pick a broadcast time (or choose to start it yourself) and pay <span class="pv-a">$9</span><span class="pv-b">$19</span>.</li>
         <li>You get two links: a share link for the league and a private commissioner link for you.</li>
         <li>At showtime everyone on the link watches the same broadcast at the same moment. Anyone who misses it gets the replay.</li>
       </ol>
@@ -232,7 +249,7 @@
             </select>
             <div id="runtimeEst" class="runtime-est"></div>
           </div>
-          <button class="btn-gold buy-cta" id="buyBtn">Seal my order &amp; get my links · $9</button>
+          <button class="btn-gold buy-cta" id="buyBtn">Seal my order &amp; get my links · <span class="pv-a">$9</span><span class="pv-b">$19</span></button>
           <div class="buy-fine">One-time payment per league. Secure checkout through Stripe. If anything goes wrong with your broadcast, email <a href="mailto:neej@buildwithneej.com">neej@buildwithneej.com</a> and we'll fix it or refund you.</div>
         </div>
         <div id="noLeague" class="no-league" style="display:none;">
@@ -254,7 +271,7 @@
         <dt>Phones?</dt>
         <dd>Works on phones and laptops. Viewers tap once to join, which turns the sound on (phones require that tap before a page can play audio).</dd>
         <dt>What does it cost?</dt>
-        <dd>$9, once, per league. The free generator on the home page stays free.</dd>
+        <dd><span class="pv-a">$9</span><span class="pv-b">$19</span>, once, per league. The free generator on the home page stays free.</dd>
       </dl>
     </section>
 
@@ -408,6 +425,9 @@
       });
 
       var buyBtn = document.getElementById("buyBtn");
+      // Saved rather than rewritten from a literal: the label carries the price
+      // test's two <span>s, and retyping it here would pin the button to one arm.
+      var buyBtnHtml = buyBtn ? buyBtn.innerHTML : "";
       if (buyBtn) buyBtn.addEventListener("click", function () {
         var mode = document.querySelector('input[name="mode"]:checked').value;
         var scheduledAt = null;
@@ -427,6 +447,8 @@
             weighted: !!stored.weighted,
             scheduledAt: scheduledAt,
             pickGapSeconds: Number(document.getElementById("gapSelect").value),
+            variant: window.fdlAb ? window.fdlAb.variant : "a",
+            visitorId: window.fdlAb ? window.fdlAb.visitorId : null,
           }),
         })
           .then(function (res) { return res.json().then(function (j) { return { ok: res.ok, j: j }; }); })
@@ -434,12 +456,12 @@
             if (r.ok && r.j.url) { location.href = r.j.url; return; }
             alert(r.j.error || "Checkout didn't start. Try again.");
             buyBtn.disabled = false;
-            buyBtn.textContent = "Seal my order & get my links · $9";
+            buyBtn.innerHTML = buyBtnHtml;
           })
           .catch(function () {
             alert("Checkout didn't start. Try again.");
             buyBtn.disabled = false;
-            buyBtn.textContent = "Seal my order & get my links · $9";
+            buyBtn.innerHTML = buyBtnHtml;
           });
       });
     })();

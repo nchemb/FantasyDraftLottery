@@ -1,5 +1,10 @@
 const { sbInsert, sbUpdate, stripe, newRevealId, newHostToken, validateInput } = require("./_lib");
 
+// Price test, opened 2026-08-07. The client picks its arm and renders the
+// matching price, but the amount charged is only ever read from here -- a
+// forged variant can land on 'a', never on an amount of its own choosing.
+const PRICES = { a: 900, b: 1900 };
+
 // Optional scheduled showtime: must parse, sit in the future, and land within 90 days.
 function parseSchedule(raw) {
   if (!raw) return { scheduledAt: null };
@@ -28,6 +33,15 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "Invalid pick pacing" });
   }
 
+  const variant = PRICES[req.body && req.body.variant] ? req.body.variant : "a";
+  const amount = PRICES[variant];
+
+  // Joins the sale back to the funnel rows in fdl_ab_events, so a purchase can
+  // be traced to the visitor who saw the price rather than only counted.
+  const rawVisitor = req.body && req.body.visitorId;
+  const visitorId =
+    typeof rawVisitor === "string" && /^[a-f0-9]{16,32}$/.test(rawVisitor) ? rawVisitor : null;
+
   const baseUrl = process.env.BASE_URL;
   if (!baseUrl || !process.env.STRIPE_SECRET_KEY || !process.env.SUPABASE_URL) {
     console.error("Missing env config for checkout");
@@ -43,19 +57,23 @@ module.exports = async function handler(req, res) {
       host_token: newHostToken(),
       scheduled_at: sched.scheduledAt,
       pick_gap_seconds: pickGap,
+      price_variant: variant,
+      amount_cents: amount,
+      visitor_id: visitorId,
     });
 
     const session = await stripe("checkout/sessions", {
       mode: "payment",
       // Stripe's Adaptive Pricing is on by default: it geolocates the buyer and
-      // puts a currency chooser above the card form. On a $9 US fantasy football
-      // product that reads as a scam, so pin it to the one price we quote.
+      // puts a currency chooser above the card form. On a sub-$20 US fantasy
+      // football product that reads as a scam, so pin it to the price we quote.
       "adaptive_pricing[enabled]": "false",
       client_reference_id: row.id,
       "metadata[reveal_uuid]": row.id,
+      "metadata[price_variant]": variant,
       "line_items[0][quantity]": "1",
       "line_items[0][price_data][currency]": "usd",
-      "line_items[0][price_data][unit_amount]": "900",
+      "line_items[0][price_data][unit_amount]": String(amount),
       "line_items[0][price_data][product_data][name]": "Draft Night '26 — Live Broadcast Draft Reveal",
       "line_items[0][price_data][product_data][description]": `Sealed draft order and live announcer broadcast for ${parsed.leagueName}`,
       success_url: `${baseUrl}/api/finalize?session_id={CHECKOUT_SESSION_ID}`,

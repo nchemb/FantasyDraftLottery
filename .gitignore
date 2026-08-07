@@ -9,3 +9,6 @@
 # history — drop these two lines if you'd rather have them backed up.
 .planning/unknowns/draft-night-broadcast/keyframes/
 .planning/unknowns/draft-night-broadcast/clips/
+
+# Playwright MCP scratch output
+.playwright-mcp/
