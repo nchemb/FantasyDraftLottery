@@ -33,8 +33,10 @@ for (const line of fs.readFileSync(path.join(ROOT, ".env"), "utf8").split("\n"))
 
 const { SUPABASE_URL, sbHeaders } = require(ROOT + "/api/_lib");
 
-// Nothing before this carried a variant, and everything before it was $9.
-const TEST_OPENED = "2026-08-07T00:00:00Z";
+// The deploy, to the minute. Midnight was wrong: the migration backfilled every
+// pre-test sale as arm 'a', so a whole day of $9 sales that predated the split
+// counted as arm 'a' beating arm 'b', which is a control that wasn't running yet.
+const TEST_OPENED = "2026-08-07T23:17:00Z";
 
 const PRICES = { a: 900, b: 1900 };
 
