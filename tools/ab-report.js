@@ -61,13 +61,13 @@ async function main() {
     sb("fdl_ab_events", `select=variant,event&created_at=gte.${since}&limit=100000`),
     sb(
       "fdl_reveals",
-      `select=price_variant,amount_cents,sealed&created_at=gte.${since}&limit=100000`
+      `select=price_variant,amount_cents,sealed,visitor_id&created_at=gte.${since}&limit=100000`
     ),
   ]);
 
   const arms = { a: null, b: null };
   for (const v of Object.keys(arms)) {
-    arms[v] = { exposure: 0, cta_click: 0, starts: 0, paid: 0, revenue: 0 };
+    arms[v] = { exposure: 0, cta_click: 0, starts: 0, paid: 0, revenue: 0, buyers: new Set() };
   }
 
   for (const e of events) {
@@ -81,6 +81,10 @@ async function main() {
     if (r.sealed) {
       arm.paid++;
       arm.revenue += r.amount_cents || PRICES[r.price_variant];
+      // One commissioner can run several leagues, and one did -- two purchases
+      // minutes apart. Revenue counts both; a conversion RATE must not, or a
+      // single enthusiastic buyer reads as two people persuaded by the price.
+      if (r.visitor_id) arm.buyers.add(r.visitor_id);
     }
   }
 
@@ -95,10 +99,11 @@ async function main() {
         clicked: x.cta_click,
         "click%": rate(x.cta_click, x.exposure),
         started: x.starts,
-        paid: x.paid,
-        "buy%": rate(x.paid, x.exposure),
+        sales: x.paid,
+        buyers: x.buyers.size,
+        "buy%": rate(x.buyers.size, x.exposure),
         revenue: money(x.revenue),
-        "rev/visitor": x.exposure ? money(Math.round(x.revenue / x.exposure)) : "—",
+        "rev/visitor": x.exposure ? "$" + (x.revenue / x.exposure / 100).toFixed(3) : "—",
       };
     })
   );
@@ -121,13 +126,30 @@ async function main() {
   // What matters is not whether conversion dropped -- it will -- but whether it
   // dropped past the point where the higher price stops paying for itself.
   const breakeven = PRICES.a / PRICES.b;
-  if (A.paid && A.exposure) {
-    const held = B.paid / B.exposure / (A.paid / A.exposure);
+  if (A.buyers.size && A.exposure) {
+    const held = B.buyers.size / B.exposure / (A.buyers.size / A.exposure);
     console.log(
       `$19 is holding ${pct(held)} of the $9 buy rate. Breakeven is ${pct(breakeven)}. ` +
         `-> ${held >= breakeven ? "$19 is winning" : "$19 is losing"}`
     );
   }
+
+  // The honest headline while the sample is thin. A verdict that one more sale
+  // would reverse is not a verdict, and "-31%" reads far more settled than it
+  // is -- so print the number of sales that would flip it, every time.
+  const perVisitorA = A.revenue / A.exposure;
+  let flips = 0;
+  while (flips < 50) {
+    flips++;
+    const swung = (B.revenue + flips * PRICES.b) / B.exposure;
+    if (swung > perVisitorA === !(rpeB > perVisitorA)) break;
+  }
+  console.log(
+    rpeB > perVisitorA
+      ? `Fragility: $19 is ahead, but it is only ${B.paid} sale(s) of margin.`
+      : `Fragility: ${flips} more sale(s) in the $19 arm flips this to a win. ` +
+          `At ${B.paid} vs ${A.paid} sales, that is a coin flip, not a finding.`
+  );
 
   // Clicks land days before sales do, so this is the early read.
   if (A.exposure && B.exposure && A.cta_click) {
