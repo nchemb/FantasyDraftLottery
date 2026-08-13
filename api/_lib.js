@@ -1,5 +1,21 @@
 const crypto = require("crypto");
 
+// ---------------------------------------------------------------------------
+// Price test. One definition, imported by checkout (what to charge), by the
+// event beacon (what to stamp), and by the report (what to compare) -- three
+// call sites that would otherwise drift the moment a price changes.
+//
+// Phase 1 ($9 vs $19) ran 2026-08-07 to 2026-08-12: $19 took 1 buyer out of
+// 485 against 6 of 489 at $9, a 76% drop in revenue per visitor. It didn't
+// suppress clicks at all -- $19 was clicked MORE -- so the number wasn't
+// scaring people off the page, it was stopping them at the buy button.
+//
+// Phase 2 retests at $15, where conversion only has to hold 60% of the $9 rate
+// to win, against the 47% $19 never came close to. Bumping PRICE_PHASE is what
+// keeps the two eras from being pooled; never change a price without it.
+const PRICE_PHASE = 2;
+const PRICES = { a: 900, b: 1500 };
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -253,6 +269,8 @@ function validateInput(body) {
 }
 
 module.exports = {
+  PRICE_PHASE,
+  PRICES,
   SUPABASE_URL,
   sbHeaders,
   sbSelect,

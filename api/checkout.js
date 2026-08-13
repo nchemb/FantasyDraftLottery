@@ -1,9 +1,6 @@
-const { sbInsert, sbUpdate, stripe, newRevealId, newHostToken, validateInput } = require("./_lib");
-
-// Price test, opened 2026-08-07. The client picks its arm and renders the
-// matching price, but the amount charged is only ever read from here -- a
-// forged variant can land on 'a', never on an amount of its own choosing.
-const PRICES = { a: 900, b: 1900 };
+const {
+  sbInsert, sbUpdate, stripe, newRevealId, newHostToken, validateInput, PRICES, PRICE_PHASE,
+} = require("./_lib");
 
 // Optional scheduled showtime: must parse, sit in the future, and land within 90 days.
 function parseSchedule(raw) {
@@ -33,6 +30,9 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "Invalid pick pacing" });
   }
 
+  // The client picks its arm and renders the matching price, but the amount
+  // charged is only ever read from the server-side table -- a forged variant
+  // can land on 'a', never on an amount of its own choosing.
   const variant = PRICES[req.body && req.body.variant] ? req.body.variant : "a";
   const amount = PRICES[variant];
 
@@ -59,6 +59,7 @@ module.exports = async function handler(req, res) {
       pick_gap_seconds: pickGap,
       price_variant: variant,
       amount_cents: amount,
+      price_phase: PRICE_PHASE,
       visitor_id: visitorId,
     });
 

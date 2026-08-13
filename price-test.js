@@ -11,6 +11,13 @@
   var VARIANT_KEY = "fdl_pv";
   var VISITOR_KEY = "fdl_vid";
   var PENDING_KEY = "fdl_pv_new";
+  var PHASE_KEY = "fdl_pv_phase";
+
+  // Must match PRICE_PHASE in api/_lib.js. When the tested price changes, a
+  // returning visitor still has an exposure logged against the OLD price, so
+  // without re-exposing them their purchase would land in the new phase with no
+  // denominator behind it and inflate the rate. Bumping this re-arms them.
+  var PHASE = "2";
 
   var variant = "a";
   var visitorId = null;
@@ -39,6 +46,13 @@
       if (variant !== "a" && variant !== "b") {
         variant = Math.random() < 0.5 ? "a" : "b";
         localStorage.setItem(VARIANT_KEY, variant);
+        localStorage.setItem(PENDING_KEY, "1");
+      }
+      // The arm stays sticky across a price change -- re-rolling would move
+      // someone from $15 to $9 mid-shop -- but the exposure is logged again so
+      // this phase counts them in its own denominator.
+      if (localStorage.getItem(PHASE_KEY) !== PHASE) {
+        localStorage.setItem(PHASE_KEY, PHASE);
         localStorage.setItem(PENDING_KEY, "1");
       }
       visitorId = localStorage.getItem(VISITOR_KEY);

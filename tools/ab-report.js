@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 /**
- * Price test readout: $9 (arm a) vs $19 (arm b).
+ * Price test readout. Arm 'a' is the incumbent price, arm 'b' the challenger.
  *
- *   node tools/ab-report.js            # since the test opened
- *   node tools/ab-report.js --days 3   # last 3 days only
+ *   node tools/ab-report.js            # the phase currently running
+ *   node tools/ab-report.js --phase 1  # a finished phase
+ *   node tools/ab-report.js --days 3   # last 3 days within the phase
+ *
+ * Phase 1 ($9 vs $19) is closed: $19 took 1 buyer of 485 against 6 of 489, a
+ * 76% drop in revenue per visitor, while being clicked MORE. Interest was fine;
+ * the number stopped people at the buy button. Phase 2 retests at $15.
  *
  * Reads the funnel, not just the sales:
  *
@@ -17,7 +22,7 @@
  * volume a conversion-rate difference will never reach significance -- that
  * needs roughly 1,000 exposures per arm. What is readable is which arm made
  * more money per visitor, and the arithmetic that settles it is the breakeven:
- * $19 only has to hold 47% of the $9 conversion rate to win.
+ * the challenger only has to hold (incumbent / challenger) of the buy rate.
  *
  * Exposures include bots. They split 50/50 across arms, so they inflate both
  * denominators without biasing the comparison between them.
@@ -31,14 +36,21 @@ for (const line of fs.readFileSync(path.join(ROOT, ".env"), "utf8").split("\n"))
   if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
 }
 
-const { SUPABASE_URL, sbHeaders } = require(ROOT + "/api/_lib");
+const { SUPABASE_URL, sbHeaders, PRICES, PRICE_PHASE } = require(ROOT + "/api/_lib");
 
-// The deploy, to the minute. Midnight was wrong: the migration backfilled every
-// pre-test sale as arm 'a', so a whole day of $9 sales that predated the split
-// counted as arm 'a' beating arm 'b', which is a control that wasn't running yet.
-const TEST_OPENED = "2026-08-07T23:17:00Z";
+// Phases, not timestamps. The window used to be a hand-edited date and it was
+// wrong on day one: it swept in a day of pre-test $9 sales and reported them as
+// arm 'a' beating a control that wasn't running yet. Rows now carry the phase
+// that produced them, so the boundary can't drift out of sync with the price.
+// `--phase 1` reads the finished $9-vs-$19 run.
+const PHASE = (() => {
+  const i = process.argv.indexOf("--phase");
+  return i !== -1 && process.argv[i + 1] ? Number(process.argv[i + 1]) : PRICE_PHASE;
+})();
 
-const PRICES = { a: 900, b: 1900 };
+// What each phase was testing, so a finished run still labels its own prices.
+const PHASE_PRICES = { 1: { a: 900, b: 1900 }, 2: PRICES };
+const P = PHASE_PRICES[PHASE] || PRICES;
 
 async function sb(table, query) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, { headers: sbHeaders() });
@@ -51,17 +63,21 @@ const pct = (n) => (n * 100).toFixed(2) + "%";
 const rate = (num, den) => (den ? pct(num / den) : "—");
 
 async function main() {
+  // --days narrows within the phase; it never reaches across one, because two
+  // prices in one average is not a number that means anything.
   const daysArg = process.argv.indexOf("--days");
-  const since =
+  const sinceFilter =
     daysArg !== -1 && process.argv[daysArg + 1]
-      ? new Date(Date.now() - Number(process.argv[daysArg + 1]) * 86400000).toISOString()
-      : TEST_OPENED;
+      ? `&created_at=gte.${new Date(
+          Date.now() - Number(process.argv[daysArg + 1]) * 86400000
+        ).toISOString()}`
+      : "";
 
   const [events, reveals] = await Promise.all([
-    sb("fdl_ab_events", `select=variant,event&created_at=gte.${since}&limit=100000`),
+    sb("fdl_ab_events", `select=variant,event&phase=eq.${PHASE}${sinceFilter}&limit=100000`),
     sb(
       "fdl_reveals",
-      `select=price_variant,amount_cents,sealed,visitor_id&created_at=gte.${since}&limit=100000`
+      `select=price_variant,amount_cents,sealed,visitor_id&price_phase=eq.${PHASE}${sinceFilter}&limit=100000`
     ),
   ]);
 
@@ -80,7 +96,7 @@ async function main() {
     arm.starts++;
     if (r.sealed) {
       arm.paid++;
-      arm.revenue += r.amount_cents || PRICES[r.price_variant];
+      arm.revenue += r.amount_cents || P[r.price_variant];
       // One commissioner can run several leagues, and one did -- two purchases
       // minutes apart. Revenue counts both; a conversion RATE must not, or a
       // single enthusiastic buyer reads as two people persuaded by the price.
@@ -88,13 +104,13 @@ async function main() {
     }
   }
 
-  console.log(`\nPrice test since ${since}\n`);
+  console.log(`\nPrice test — phase ${PHASE}: ${money(P.a)} vs ${money(P.b)}\n`);
 
   console.table(
     ["a", "b"].map((v) => {
       const x = arms[v];
       return {
-        arm: `${v} (${money(PRICES[v])})`,
+        arm: `${v} (${money(P[v])})`,
         saw_price: x.exposure,
         clicked: x.cta_click,
         "click%": rate(x.cta_click, x.exposure),
@@ -119,18 +135,21 @@ async function main() {
   const rpeA = A.revenue / A.exposure;
   const rpeB = B.revenue / B.exposure;
   const lift = rpeA ? (rpeB - rpeA) / rpeA : 0;
+  const nameA = money(P.a);
+  const nameB = money(P.b);
   console.log(
-    `Revenue per visitor: $19 arm is ${lift >= 0 ? "+" : ""}${pct(lift)} vs the $9 arm.`
+    `Revenue per visitor: ${nameB} arm is ${lift >= 0 ? "+" : ""}${pct(lift)} vs the ${nameA} arm.`
   );
 
   // What matters is not whether conversion dropped -- it will -- but whether it
   // dropped past the point where the higher price stops paying for itself.
-  const breakeven = PRICES.a / PRICES.b;
+  const breakeven = P.a / P.b;
   if (A.buyers.size && A.exposure) {
     const held = B.buyers.size / B.exposure / (A.buyers.size / A.exposure);
     console.log(
-      `$19 is holding ${pct(held)} of the $9 buy rate. Breakeven is ${pct(breakeven)}. ` +
-        `-> ${held >= breakeven ? "$19 is winning" : "$19 is losing"}`
+      `${nameB} is holding ${pct(held)} of the ${nameA} buy rate. ` +
+        `Breakeven is ${pct(breakeven)}. ` +
+        `-> ${held >= breakeven ? nameB + " is winning" : nameB + " is losing"}`
     );
   }
 
@@ -141,13 +160,13 @@ async function main() {
   let flips = 0;
   while (flips < 50) {
     flips++;
-    const swung = (B.revenue + flips * PRICES.b) / B.exposure;
+    const swung = (B.revenue + flips * P.b) / B.exposure;
     if (swung > perVisitorA === !(rpeB > perVisitorA)) break;
   }
   console.log(
     rpeB > perVisitorA
-      ? `Fragility: $19 is ahead, but it is only ${B.paid} sale(s) of margin.`
-      : `Fragility: ${flips} more sale(s) in the $19 arm flips this to a win. ` +
+      ? `Fragility: ${nameB} is ahead, but it is only ${B.paid} sale(s) of margin.`
+      : `Fragility: ${flips} more sale(s) in the ${nameB} arm flips this to a win. ` +
           `At ${B.paid} vs ${A.paid} sales, that is a coin flip, not a finding.`
   );
 
@@ -155,7 +174,7 @@ async function main() {
   if (A.exposure && B.exposure && A.cta_click) {
     const heldClicks = B.cta_click / B.exposure / (A.cta_click / A.exposure);
     console.log(
-      `Early signal -- $19 is holding ${pct(heldClicks)} of the $9 click-through rate.`
+      `Early signal -- ${nameB} is holding ${pct(heldClicks)} of the ${nameA} click-through rate.`
     );
   }
 

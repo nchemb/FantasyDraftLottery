@@ -10,7 +10,7 @@
 // checkout_start and paid come off fdl_reveals; the two front-end steps land
 // here. Rows are unique per (visitor_id, event), so a repeat click collapses
 // into the first and every step counts people rather than clicks.
-const { SUPABASE_URL, sbHeaders } = require("./_lib");
+const { SUPABASE_URL, sbHeaders, PRICE_PHASE } = require("./_lib");
 
 const ALLOWED_ORIGINS = [
   "https://www.fantasydraftlottery.com",
@@ -53,10 +53,19 @@ module.exports = async function handler(req, res) {
         visitor_id: visitorId,
         variant,
         event,
+        // Stamped server-side, not taken from the client: the phase decides
+        // which price era a row is compared against, so it has to be the one
+        // the server is actually charging.
+        phase: PRICE_PHASE,
         path: typeof body.path === "string" ? body.path.slice(0, 120) : null,
       }),
     });
-    if (!r.ok) console.error("Event insert failed:", r.status, await r.text());
+    // 409 is the dedupe doing its job -- a second click, a reload, a retry --
+    // so it is the expected path, not a failure. Logging it as one buries the
+    // real errors in noise from ordinary traffic.
+    if (!r.ok && r.status !== 409) {
+      console.error("Event insert failed:", r.status, await r.text());
+    }
   } catch (err) {
     // A dropped event loses one data point. It must never break the page.
     console.error("Event error:", err);
