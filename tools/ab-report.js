@@ -49,7 +49,7 @@ const PHASE = (() => {
 })();
 
 // What each phase was testing, so a finished run still labels its own prices.
-const PHASE_PRICES = { 1: { a: 900, b: 1900 }, 2: PRICES };
+const PHASE_PRICES = { 1: { a: 900, b: 1900 }, 2: { a: 900, b: 1500 }, 3: PRICES };
 const P = PHASE_PRICES[PHASE] || PRICES;
 
 async function sb(table, query) {

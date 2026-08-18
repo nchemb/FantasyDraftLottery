@@ -10,11 +10,11 @@ const crypto = require("crypto");
 // suppress clicks at all -- $19 was clicked MORE -- so the number wasn't
 // scaring people off the page, it was stopping them at the buy button.
 //
-// Phase 2 retests at $15, where conversion only has to hold 60% of the $9 rate
-// to win, against the 47% $19 never came close to. Bumping PRICE_PHASE is what
-// keeps the two eras from being pooled; never change a price without it.
-const PRICE_PHASE = 2;
-const PRICES = { a: 900, b: 1500 };
+// Phase 2 ($15) held 24% of the $9 buy rate against a 60% bar — same pattern
+// as phase 1 ($19 at 17% against 47%): clicks identical, buyers crater. Phase
+// 3 tests $12, where breakeven is 75%.
+const PRICE_PHASE = 3;
+const PRICES = { a: 900, b: 1200 };
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;

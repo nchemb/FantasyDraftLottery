@@ -17,7 +17,7 @@
   // returning visitor still has an exposure logged against the OLD price, so
   // without re-exposing them their purchase would land in the new phase with no
   // denominator behind it and inflate the rate. Bumping this re-arms them.
-  var PHASE = "2";
+  var PHASE = "3";
 
   var variant = "a";
   var visitorId = null;
