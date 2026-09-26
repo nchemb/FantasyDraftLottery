@@ -12,9 +12,12 @@ const crypto = require("crypto");
 //
 // Phase 2 ($15) held 24% of the $9 buy rate against a 60% bar — same pattern
 // as phase 1 ($19 at 17% against 47%): clicks identical, buyers crater. Phase
-// 3 tests $12, where breakeven is 75%.
+// 3 tested $12, where breakeven is 75%.
+//
+// Test ended 2026-09-26: flat $12 for everyone. Both arms stay so old
+// clients and the report keep working, but they charge the same.
 const PRICE_PHASE = 3;
-const PRICES = { a: 900, b: 1200 };
+const PRICES = { a: 1200, b: 1200 };
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
