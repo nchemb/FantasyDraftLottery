@@ -13,10 +13,11 @@ const {
 } = require("./_lib");
 const crypto = require("crypto");
 
-// Account concurrency cap is 5 (measured: 6 in flight returns 429). 4 leaves
-// headroom for retries and renders a 32-team league (34 clips, ~3.5s each) in
-// roughly 30s — inside the 60s function budget set in vercel.json.
-const TTS_CONCURRENCY = 4;
+// Matches the ElevenLabs Starter plan's cap of 3 concurrent requests (Creator
+// was 5). A 32-team league (34 clips, ~3.5s each) renders in roughly 40s,
+// inside the 60s function budget set in vercel.json; a 12-team one in ~17s.
+// Raise this if the plan goes back up.
+const TTS_CONCURRENCY = 3;
 
 function errorPage(res, code, message) {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
