@@ -55,6 +55,13 @@
   // announcer element with before the real urls are released at showtime.
   var SILENT_MP3 = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYyLjEyLjEwMgAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAABAAAAlgAenp6enp6enp6enp6enp6enp6enp6enp6pqampqampqampqampqampqampqampqamptPT09PT09PT09PT09PT09PT09PT09PT09P/////////////////////////////////AAAAAExhdmM2Mi4yOAAAAAAAAAAAAAAAACQCcQAAAAAAAAJY+/pGGwAAAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NCxKMAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
   var BED_MUSIC_URL = "broadcast/bed-music.mp3";
+  // Each bed is loudness-matched to the football one (~-13.8 dB mean), so the
+  // BED_VOLUME/BED_DUCKED levels below hold for every sport.
+  var SPORT_MUSIC = {
+    basketball: "broadcast/bed-music-basketball.mp3",
+    hockey: "broadcast/bed-music-hockey.mp3",
+  };
+  var SPORT_START = { football: "KICKOFF", basketball: "TIP-OFF", hockey: "PUCK DROP" };
   // Measured against the announcer (-13.3 dB mean) via tools/render-audio-preview.js:
   // 0.28 puts the bed ~12 dB under VO (present but light), 0.12 ~19 dB under
   // while he's talking. 0.08 measured 22.5 dB under — effectively inaudible.
@@ -691,7 +698,7 @@
     $("joinBtn").addEventListener("click", function () {
       joined = true;
       $("joinBtn").disabled = true;
-      $("joinBtn").textContent = "JOINED — WAITING FOR KICKOFF";
+      $("joinBtn").textContent = "JOINED — WAITING FOR " + (SPORT_START[data && data.sport] || "KICKOFF");
       // The bed keeps PLAYING through the countdown rather than being paused
       // and restarted: pausing meant a 4MB re-buffer at showtime, which is why
       // the music used to arrive late. Starting it the instant you join is the
@@ -777,6 +784,7 @@
 
     fetchReveal()
       .then(function (d) {
+        if (SPORT_MUSIC[d.sport]) $("bedMusic").src = SPORT_MUSIC[d.sport];
         renderWaitingRoom();
         // Show the share link on EVERY commissioner visit, not just the one
         // right after checkout. A host returning from history has the token in

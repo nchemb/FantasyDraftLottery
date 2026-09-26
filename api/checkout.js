@@ -24,6 +24,9 @@ module.exports = async function handler(req, res) {
   const sched = parseSchedule(req.body && req.body.scheduledAt);
   if (sched.error) return res.status(400).json({ error: sched.error });
 
+  const SPORTS = ["football", "basketball", "hockey"];
+  const sport = SPORTS.includes(req.body && req.body.sport) ? req.body.sport : "football";
+
   const GAP_CHOICES = [0, 30, 60, 120, 300];
   const pickGap = Number((req.body && req.body.pickGapSeconds) || 0);
   if (!GAP_CHOICES.includes(pickGap)) {
@@ -57,6 +60,7 @@ module.exports = async function handler(req, res) {
       host_token: newHostToken(),
       scheduled_at: sched.scheduledAt,
       pick_gap_seconds: pickGap,
+      sport,
       price_variant: variant,
       amount_cents: amount,
       price_phase: PRICE_PHASE,

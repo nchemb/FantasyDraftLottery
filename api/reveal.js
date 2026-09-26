@@ -34,6 +34,7 @@ module.exports = async function handler(req, res) {
       mode: row.scheduled_at ? "scheduled" : "manual",
       scheduledAt: row.scheduled_at,
       pickGapSeconds: row.pick_gap_seconds || 0,
+      sport: row.sport || "football",
       showStartedAt: showStart ? new Date(showStart).toISOString() : null,
       serverNow: new Date().toISOString(),
       live,

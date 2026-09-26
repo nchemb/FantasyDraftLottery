@@ -3,8 +3,92 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Draft Night '26 — Live Broadcast Draft Reveal | Fantasy Draft Lottery</title>
-  <meta name="description" content="Turn your fantasy draft order reveal into a live broadcast. Sealed, tamper-proof order plus an announcer who calls every pick. One flat price per league.">
+  <title>Live Fantasy Draft Order Reveal for Football, Basketball &amp; Hockey | Draft Night '26</title>
+  <meta name="description" content="Reveal your fantasy football, basketball or hockey draft order as a live broadcast. Sealed, tamper-proof order and an announcer who calls every pick by team name. One flat price per league.">
+  <link rel="canonical" href="https://www.fantasydraftlottery.com/draft-night.html">
+  <meta property="og:title" content="Draft Night '26: Live Fantasy Draft Order Reveal">
+  <meta property="og:description" content="A sealed draft order, revealed live with an announcer calling every pick. Football, basketball and hockey.">
+  <meta property="og:url" content="https://www.fantasydraftlottery.com/draft-night.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fantasy Draft Lottery">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Draft Night '26 Live Broadcast Draft Reveal",
+  "description": "A sealed, tamper-proof fantasy draft order revealed as a live broadcast, with an announcer calling every pick by team name. For fantasy football, basketball and hockey leagues of 2 to 32 teams.",
+  "url": "https://www.fantasydraftlottery.com/draft-night.html",
+  "brand": {
+    "@type": "Brand",
+    "name": "Fantasy Draft Lottery"
+  },
+  "offers": {
+    "@type": "AggregateOffer",
+    "lowPrice": "9",
+    "highPrice": "12",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "url": "https://www.fantasydraftlottery.com/draft-night.html"
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Which sports does Draft Night work for?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fantasy football, basketball and hockey. Pick your sport when you set up the broadcast and it plays that sport's music. Any league with 2 to 32 teams works, including keeper and dynasty leagues."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if someone can't make it live?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The same link plays the replay after the broadcast ends. They miss the moment, not the result."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I change the time after I pay?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Your commissioner link lets you move the broadcast time any time before it starts."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I see the order early, as the commissioner?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The order is generated and sealed on the server when you pay, and nobody sees it until showtime, including the commissioner."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it work on phones?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, on phones and laptops. Viewers tap once to join, which turns the sound on."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does Draft Night cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "$9 to $12, once, per league. The free draft order generator on the home page stays free."
+      }
+    }
+  ]
+}
+  </script>
   <link rel="icon" href="https://img.icons8.com/offices/30/000000/trophy.png">
   <!-- Microsoft Clarity. Was on the home page but not here, which left the one
        page where the money happens with no session recordings or heatmaps. -->
@@ -179,7 +263,7 @@
     <div>
       <div class="hero-brand">FANTASY DRAFT LOTTERY PRESENTS</div>
       <h1>DRAFT NIGHT '26</h1>
-      <p class="hero-sub">Your draft order reveal, run as a live broadcast. An announcer calls every pick by name while your whole league watches the board fill in, together, in real time.</p>
+      <p class="hero-sub">Your fantasy football, basketball or hockey draft order reveal, run as a live broadcast. An announcer calls every pick by name while your whole league watches the board fill in, together, in real time.</p>
       <a class="btn-gold" href="#buy" data-ab-cta>Set up my broadcast · <span class="pv-a">$9</span><span class="pv-b">$12</span></a>
       <a class="btn-outline" href="reveal.html?demo=1" target="_blank">Watch the sample</a>
     </div>
@@ -225,6 +309,14 @@
             <div class="roster-foot" id="rosterFoot" style="display:none;"></div>
           </div>
           <a class="roster-edit" href="/" id="rosterEdit">← Edit teams or weights</a>
+          <div class="mode-row">
+            <label for="sportSelect" style="border:none; padding:0 0 4px; margin:0; cursor:default;">Sport</label>
+            <select id="sportSelect" style="width:100%; background:#101a30; border:1px solid rgba(244,241,232,0.25); color:var(--white); border-radius:5px; padding:12px; font-family:inherit; font-size:15px;">
+              <option value="football" selected>🏈 Football</option>
+              <option value="basketball">🏀 Basketball</option>
+              <option value="hockey">🏒 Hockey</option>
+            </select>
+          </div>
           <div class="mode-row" id="modeRow">
             <label id="labelSched" class="selected">
               <input type="radio" name="mode" value="scheduled" checked>
@@ -262,6 +354,8 @@
     <section class="faq">
       <h2>Questions leagues actually ask</h2>
       <dl>
+        <dt>Which sports does it work for?</dt>
+        <dd>Fantasy football, basketball and hockey. Pick your sport at setup and the broadcast plays that sport's music. Keeper and dynasty leagues work too.</dd>
         <dt>What if someone can't make it live?</dt>
         <dd>The same link plays the replay after the broadcast ends. They miss the moment, not the result.</dd>
         <dt>Can I change the time after I pay?</dt>
@@ -447,6 +541,7 @@
             weighted: !!stored.weighted,
             scheduledAt: scheduledAt,
             pickGapSeconds: Number(document.getElementById("gapSelect").value),
+            sport: document.getElementById("sportSelect").value,
             variant: window.fdlAb ? window.fdlAb.variant : "a",
             visitorId: window.fdlAb ? window.fdlAb.visitorId : null,
           }),

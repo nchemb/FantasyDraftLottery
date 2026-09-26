@@ -1,0 +1,14 @@
+# Fantasy Draft Lottery
+
+> Fantasy Draft Lottery (fantasydraftlottery.com) sets the draft order for fantasy football, basketball, hockey and baseball leagues. The draft order generator is free, needs no signup, and supports 2 to 32 teams with either a random order or a weighted lottery (extra lottery balls per team, like the NBA draft lottery). Draft Night '26 is the paid upgrade: the order is sealed server-side the moment you pay, then revealed as a live broadcast with an AI announcer calling every pick by team name.
+
+## Product
+- [Free draft order generator](https://www.fantasydraftlottery.com/): random or weighted, 2-32 teams, instant results, NFL/NBA/NHL music on the results page.
+- [Draft Night '26 live broadcast reveal](https://www.fantasydraftlottery.com/draft-night.html): one-time $9-$12 per league. Pick a sport (football, basketball, hockey), schedule a showtime or start it manually, and share one link. The order is generated and sealed with a timestamp and cryptographic hash before anyone, including the commissioner, can see it, so it can't be rerolled. Replay available after the show.
+
+## Guides
+- [How to set draft order for fantasy basketball and hockey](https://www.fantasydraftlottery.com/blogPosts/post5.html)
+- [How to run a fantasy draft lottery (random vs weighted)](https://www.fantasydraftlottery.com/blogPosts/post4.html)
+- [How fantasy basketball works](https://www.fantasydraftlottery.com/blogPosts/post2.html)
+- [Why play fantasy football](https://www.fantasydraftlottery.com/blogPosts/post1.html)
+- [Using fantasy football rankings and projections](https://www.fantasydraftlottery.com/blogPosts/post3.html)
