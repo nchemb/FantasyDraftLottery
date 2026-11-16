@@ -213,10 +213,12 @@ html, body {
     #05080f;
   overflow-y: auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
+/* margin:auto centers like align-items:center, but when the content is taller
+   than the screen it overflows downward only. align-items:center pushed the
+   top of a 32-team end board above the scroll origin on phones (picks 1-7 lost). */
 .wr-inner {
+  margin: auto;
   text-align: center;
   max-width: 640px;
   padding: 48px 20px;
